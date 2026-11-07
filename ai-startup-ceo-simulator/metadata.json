@@ -1,0 +1,6 @@
+{
+  "name": "AI Startup CEO Simulator",
+  "description": "A 52-week turn-based resource management simulation balancing cash, server load, AI quality, and public trust across Software, Synthetic Data, and Robotics eras.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

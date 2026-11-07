@@ -1,0 +1,4433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>AI CEO: Mr. President Tycoon - Frontier AI Race</title>
+  <meta name="description" content="A graphical, real-time AI Startup CEO simulation game. Balance cash, server loads, upgrades, swipe decrees, and race rival titans to AGI." />
+  <style>
+    :root {
+      --bg-dark: #07080d;
+      --bg-card: rgba(15, 18, 30, 0.88);
+      --bg-card-hover: rgba(22, 28, 46, 0.96);
+      --border-line: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 240, 255, 0.4);
+      
+      --cyan: #00f0ff;
+      --purple: #b800ff;
+      --green: #00ff88;
+      --red: #ff2a55;
+      --amber: #ffaa00;
+      --gold: #ffd700;
+      
+      --text-bright: #ffffff;
+      --text-mid: #94a3b8;
+      --text-dark: #64748b;
+      
+      --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      font-family: var(--font-ui);
+      overflow-x: hidden;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      background: var(--bg-dark);
+      color: var(--text-bright);
+      font-family: var(--font-ui);
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.09) 0%, transparent 55%),
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px, 24px 24px;
+    }
+
+    /* Main Responsive Viewport */
+    .app-root {
+      display: flex;
+      flex-direction: column;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 0.75rem 0.75rem calc(7.5rem + env(safe-area-inset-bottom, 24px)) 0.75rem;
+      gap: 0.85rem;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    /* TOP LIVE CLOCK & CONTROLS BAR */
+    .top-live-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(14, 18, 28, 0.9);
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      width: 100%;
+    }
+
+    .brand-clock-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .live-day-badge {
+      display: flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      padding: 0.25rem 0.65rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+    }
+
+    .live-date-sub {
+      font-size: 0.7rem;
+      color: var(--text-mid);
+      font-family: var(--font-mono);
+    }
+
+    .time-control-group {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-speed {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-line);
+      color: var(--text-mid);
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-speed:hover, .btn-speed.active {
+      background: var(--cyan);
+      color: #000;
+      border-color: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    .btn-audio {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-line);
+      color: var(--text-mid);
+      padding: 0.3rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    /* TOP LIVE HUD GAUGES */
+    .hud-gauges-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.65rem;
+      width: 100%;
+    }
+
+    @media (max-width: 800px) {
+      .hud-gauges-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .hud-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      padding: 0.75rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      min-width: 0;
+    }
+
+    .hud-box-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: 0.05em;
+    }
+
+    .hud-box-val {
+      font-size: 1.35rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      letter-spacing: -0.02em;
+      color: #fff;
+      display: flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+
+    .hud-box-sub {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .flow-pos { color: var(--green); }
+    .flow-neg { color: var(--red); }
+    .flow-warn { color: var(--amber); }
+
+    .gauge-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    .gauge-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* Live Breaking Ticker */
+    .breaking-ticker {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(255, 42, 85, 0.09);
+      border: 1px solid rgba(255, 42, 85, 0.3);
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      overflow: hidden;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    .ticker-tag {
+      background: var(--red);
+      color: #fff;
+      font-weight: 900;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      flex-shrink: 0;
+      letter-spacing: 0.05em;
+    }
+
+    .ticker-content {
+      color: #ffd6df;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* MAIN VIEW TABS */
+    .tab-content-area {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      flex: 1;
+      width: 100%;
+      min-width: 0;
+      padding-bottom: 2rem;
+    }
+
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 0.85rem;
+      animation: fadeIn 0.2s ease-out;
+      width: 100%;
+      padding-bottom: 2rem;
+    }
+
+    .tab-pane.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* GRAPHICAL 2D DATACENTER CANVAS VIEW */
+    .datacenter-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 14px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      backdrop-filter: blur(12px);
+      width: 100%;
+    }
+
+    .datacenter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .datacenter-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* TAP-TO-COMPUTE INTERACTIVE SERVER RACK CANVAS */
+    .rack-canvas-wrapper {
+      width: 100%;
+      height: 185px;
+      background: #05060a;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+      touch-action: manipulation;
+    }
+
+    .rack-canvas-wrapper:active {
+      transform: scale(0.995);
+      border-color: var(--cyan);
+    }
+
+    .rack-click-hint {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: rgba(0, 240, 255, 0.15);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      pointer-events: none;
+      letter-spacing: 0.05em;
+    }
+
+    .combo-badge {
+      position: absolute;
+      bottom: 10px;
+      left: 12px;
+      background: rgba(255, 215, 0, 0.2);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 6px;
+      pointer-events: none;
+      display: none;
+      animation: pulseGlow 0.5s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { transform: scale(1); box-shadow: 0 0 6px var(--gold); }
+      to { transform: scale(1.08); box-shadow: 0 0 14px var(--gold); }
+    }
+
+    #serverCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Clicker Tap Action Strip */
+    .tap-action-strip {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .btn-tap-compute {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(184, 0, 255, 0.2));
+      border: 1px solid var(--cyan);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+      transition: all 0.12s ease;
+    }
+
+    .btn-tap-compute:active {
+      transform: scale(0.98);
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      color: #000;
+    }
+
+    .datacenter-quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .btn-quick-ops {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-line);
+      border-radius: 8px;
+      padding: 0.55rem 0.5rem;
+      color: #fff;
+      font-size: 0.72rem;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-quick-ops:hover:not(:disabled) {
+      background: rgba(0, 240, 255, 0.12);
+      border-color: var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    .btn-quick-ops:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-quick-ops-cost {
+      font-size: 0.65rem;
+      color: var(--text-dark);
+      font-family: var(--font-mono);
+    }
+
+    /* COMPETITOR AI RACE TRACK */
+    .race-track-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 14px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      backdrop-filter: blur(12px);
+      width: 100%;
+    }
+
+    .race-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .competitor-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-line);
+      border-radius: 10px;
+      padding: 0.75rem 0.85rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s ease;
+      width: 100%;
+    }
+
+    .competitor-row.is-player {
+      border-color: rgba(0, 240, 255, 0.5);
+      background: rgba(0, 240, 255, 0.04);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+    }
+
+    .competitor-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .comp-name-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .comp-rank {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .comp-stats-right {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-mid);
+      display: flex;
+      gap: 0.65rem;
+    }
+
+    .comp-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .comp-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    /* Sabotage Actions on Rivals */
+    .rival-sabotage-bar {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-sabotage {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-line);
+      color: var(--text-mid);
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-sabotage:hover:not(:disabled) {
+      background: rgba(255, 42, 85, 0.15);
+      border-color: var(--red);
+      color: #fff;
+    }
+
+    .btn-sabotage:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* EXECUTIVE SPECIALISTS / TALENT SUITE */
+    .specialists-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+      width: 100%;
+    }
+
+    @media (max-width: 650px) {
+      .specialists-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .specialist-card {
+      background: rgba(18, 22, 36, 0.9);
+      border: 1px solid var(--border-line);
+      border-radius: 10px;
+      padding: 0.75rem;
+      display: flex;
+      gap: 0.65rem;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .specialist-card.hired {
+      border-color: var(--green);
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    .specialist-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      border: 1px solid var(--border-line);
+    }
+
+    .specialist-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .specialist-name {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .specialist-role {
+      font-size: 0.65rem;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    .specialist-perk {
+      font-size: 0.68rem;
+      color: var(--text-mid);
+      line-height: 1.25;
+    }
+
+    .btn-hire {
+      background: var(--cyan);
+      color: #000;
+      border: none;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      cursor: pointer;
+      align-self: flex-start;
+      margin-top: 0.25rem;
+    }
+
+    .btn-hire:disabled {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-dark);
+      cursor: not-allowed;
+    }
+
+    /* UPGRADES DEPARTMENT GRID */
+    .upgrades-header-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(14, 18, 28, 0.6);
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-line);
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      width: 100%;
+    }
+
+    .department-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    @media (max-width: 650px) {
+      .department-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .upgrade-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.65rem;
+      transition: all 0.2s ease;
+      min-width: 0;
+    }
+
+    .upgrade-card:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+      background: var(--bg-card-hover);
+      transform: translateY(-1px);
+    }
+
+    .upgrade-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .upgrade-title-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .upgrade-name {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .upgrade-tier {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--cyan);
+      text-transform: uppercase;
+    }
+
+    .upgrade-desc {
+      font-size: 0.72rem;
+      color: var(--text-mid);
+      line-height: 1.35;
+    }
+
+    .upgrade-benefits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+    }
+
+    .benefit-tag {
+      background: rgba(0, 255, 136, 0.12);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--green);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .btn-buy-upgrade {
+      background: var(--cyan);
+      color: #000;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      border: none;
+      padding: 0.55rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.15s ease;
+    }
+
+    .btn-buy-upgrade:hover:not(:disabled) {
+      box-shadow: 0 0 12px var(--cyan);
+      transform: scale(1.01);
+    }
+
+    .btn-buy-upgrade:disabled {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-dark);
+      cursor: not-allowed;
+    }
+
+    /* MR. PRESIDENT TINDER / REIGNS SWIPEABLE CRISIS CARD */
+    .crisis-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 12, 0.88);
+      backdrop-filter: blur(14px);
+      z-index: 1000;
+      display: none;
+      place-items: center;
+      padding: 1rem;
+      touch-action: none;
+    }
+
+    .crisis-modal-overlay.open {
+      display: grid;
+    }
+
+    .swipe-container {
+      max-width: 520px;
+      width: 100%;
+      position: relative;
+      perspective: 1000px;
+    }
+
+    .crisis-card {
+      background: rgba(18, 22, 36, 0.98);
+      border: 1px solid var(--amber);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 170, 0, 0.2);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      position: relative;
+      cursor: grab;
+      transition: transform 0.12s ease-out;
+      transform-origin: center bottom;
+    }
+
+    .crisis-card:active {
+      cursor: grabbing;
+    }
+
+    /* Swipe Stamps: VETO (Red Left) & APPROVE (Green Right) */
+    .swipe-stamp {
+      position: absolute;
+      top: 25px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 1.25rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      letter-spacing: 0.1em;
+      border: 3px solid currentColor;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+      z-index: 10;
+    }
+
+    .stamp-approve {
+      right: 25px;
+      color: var(--green);
+      transform: rotate(12deg);
+    }
+
+    .stamp-veto {
+      left: 25px;
+      color: var(--red);
+      transform: rotate(-12deg);
+    }
+
+    .crisis-top-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .crisis-badge {
+      background: rgba(255, 170, 0, 0.15);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.06em;
+    }
+
+    .crisis-headline {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+
+    .crisis-body {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.45;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-line);
+    }
+
+    .swipe-instruction-hint {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text-dark);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .crisis-choices-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    @media (max-width: 500px) {
+      .crisis-choices-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-crisis-choice {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      padding: 0.9rem 0.85rem;
+      color: #fff;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.65rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-crisis-choice:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .choice-label {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      color: var(--cyan);
+      letter-spacing: 0.05em;
+    }
+
+    .choice-text {
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .choice-effects-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 0.4rem;
+    }
+
+    .eff-badge {
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .eff-pos { background: rgba(0, 255, 136, 0.15); color: var(--green); }
+    .eff-neg { background: rgba(255, 42, 85, 0.15); color: var(--red); }
+
+    /* FRONT PAGE NEWSPAPER BREAKTHROUGH CELEBRATION MODAL */
+    .celebration-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 12, 0.92);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      display: none;
+      place-items: center;
+      padding: 1rem;
+    }
+
+    .celebration-modal-overlay.open {
+      display: grid;
+    }
+
+    #confettiCanvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .newspaper-card {
+      background: #fbf9f4;
+      color: #1a1a1a;
+      border-radius: 12px;
+      max-width: 520px;
+      width: 100%;
+      padding: 1.75rem;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      font-family: 'Times New Roman', Times, serif;
+      transform: rotate(-1deg);
+      animation: paperSlam 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes paperSlam {
+      0% { transform: scale(0.5) rotate(-15deg); opacity: 0; }
+      100% { transform: scale(1) rotate(-1deg); opacity: 1; }
+    }
+
+    .newspaper-header {
+      border-bottom: 2px solid #1a1a1a;
+      padding-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .newspaper-masthead {
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .newspaper-date-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 2px 0;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      font-weight: bold;
+    }
+
+    .newspaper-headline {
+      font-size: 1.6rem;
+      font-weight: 900;
+      line-height: 1.15;
+      text-transform: uppercase;
+      margin: 0.25rem 0;
+    }
+
+    .newspaper-article {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      border-top: 1px solid #ddd;
+      padding-top: 0.75rem;
+      color: #333;
+    }
+
+    .btn-claim-hype {
+      background: #1a1a1a;
+      color: #fff;
+      font-family: var(--font-ui);
+      font-weight: 800;
+      font-size: 0.9rem;
+      border: none;
+      padding: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 0.5rem;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-claim-hype:hover {
+      background: #333;
+    }
+
+    /* ==========================================================================
+       WAR ROOM & GLOBAL CONQUEST (DEFCON / RISK STYLE)
+       ========================================================================== */
+    .war-status-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 42, 85, 0.4);
+      border-radius: 14px;
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 0 20px rgba(255, 42, 85, 0.12);
+      width: 100%;
+    }
+
+    .defcon-bar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .defcon-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 42, 85, 0.18);
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      animation: defconPulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes defconPulse {
+      0%, 100% { box-shadow: 0 0 6px rgba(255, 42, 85, 0.3); border-color: var(--red); }
+      50% { box-shadow: 0 0 16px rgba(255, 42, 85, 0.7); border-color: #ff6b8b; }
+    }
+
+    .war-stats-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-line);
+      border-radius: 10px;
+      padding: 0.65rem;
+    }
+
+    .war-stat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-width: 0;
+    }
+
+    .war-stat-label {
+      font-size: 0.62rem;
+      color: var(--text-dark);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .war-stat-val {
+      font-size: 1.05rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* DEFCON Holographic Map Canvas */
+    .war-map-card {
+      background: #030508;
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 14px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 240, 255, 0.08);
+    }
+
+    .war-map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--cyan);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .war-canvas-container {
+      width: 100%;
+      height: 290px;
+      position: relative;
+      border-radius: 10px;
+      background: radial-gradient(circle at 50% 50%, #06101c 0%, #020306 90%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    #warMapCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Sector Chips Selector */
+    .sector-chips-scroll {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding-bottom: 0.35rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 240, 255, 0.2) transparent;
+      width: 100%;
+    }
+
+    .sector-chip {
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-line);
+      border-radius: 8px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-mid);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .sector-chip.active {
+      border-color: var(--cyan);
+      background: rgba(0, 240, 255, 0.12);
+      color: #fff;
+    }
+
+    .sector-chip.conquered {
+      border-color: rgba(0, 255, 136, 0.4);
+      color: var(--green);
+    }
+
+    /* Sector Target Dossier */
+    .sector-dossier-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 12px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .dossier-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .dossier-title {
+      font-size: 1rem;
+      font-weight: 900;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .dossier-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-line);
+    }
+
+    .dossier-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .dossier-lbl {
+      font-size: 0.62rem;
+      color: var(--text-dark);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .dossier-val {
+      font-size: 0.82rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: #fff;
+    }
+
+    .btn-invade-primary {
+      background: linear-gradient(135deg, #ff2a55 0%, #bd00ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.85rem;
+      font-family: var(--font-ui);
+      font-weight: 900;
+      font-size: 0.88rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 0 20px rgba(255, 42, 85, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-invade-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 28px rgba(255, 42, 85, 0.6);
+    }
+
+    .btn-invade-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Active Combat Simulator Panel */
+    .combat-simulator-panel {
+      background: rgba(20, 8, 14, 0.95);
+      border: 2px solid var(--red);
+      border-radius: 12px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      animation: alertPulse 1.5s infinite alternate ease-in-out;
+    }
+
+    @keyframes alertPulse {
+      from { border-color: rgba(255, 42, 85, 0.6); box-shadow: 0 0 10px rgba(255, 42, 85, 0.2); }
+      to { border-color: rgba(255, 42, 85, 1); box-shadow: 0 0 25px rgba(255, 42, 85, 0.4); }
+    }
+
+    .combat-bars-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .combat-bar-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .combat-bar-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+
+    .combat-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .combat-fill-player {
+      height: 100%;
+      background: linear-gradient(90deg, #00f0ff, #00ff88);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .combat-fill-enemy {
+      height: 100%;
+      background: linear-gradient(90deg, #ffaa00, #ff2a55);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .combat-tactical-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.4rem;
+    }
+
+    .btn-tactical {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-line);
+      color: #fff;
+      padding: 0.45rem 0.35rem;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+
+    .btn-tactical:hover:not(:disabled) {
+      background: rgba(255, 42, 85, 0.2);
+      border-color: var(--red);
+    }
+
+    .btn-tactical:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .combat-log-stream {
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 0.45rem;
+      height: 80px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    /* Military Unit Foundry / Runway Sink */
+    .military-foundry-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-line);
+      border-radius: 14px;
+      padding: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .units-market-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.65rem;
+    }
+
+    @media (max-width: 600px) {
+      .units-market-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .unit-procure-card {
+      background: rgba(14, 18, 28, 0.85);
+      border: 1px solid var(--border-line);
+      border-radius: 10px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .unit-procure-card:hover {
+      border-color: rgba(0, 240, 255, 0.4);
+    }
+
+    .unit-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .unit-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: #fff;
+    }
+
+    .unit-owned-badge {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--cyan);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .unit-desc {
+      font-size: 0.7rem;
+      color: var(--text-mid);
+      line-height: 1.35;
+    }
+
+    .unit-power-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .btn-procure-unit {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-line);
+      color: #fff;
+      padding: 0.45rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s ease;
+      margin-top: 0.2rem;
+    }
+
+    .btn-procure-unit:hover:not(:disabled) {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--cyan);
+    }
+
+    .btn-procure-unit:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    /* BOTTOM MOBILE NAVIGATION BAR */
+    .bottom-nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(4.2rem + env(safe-area-inset-bottom, 0px));
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: rgba(10, 12, 20, 0.96);
+      border-top: 1px solid var(--border-line);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 100;
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.7);
+    }
+
+    .nav-tab-btn {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      cursor: pointer;
+      font-family: var(--font-ui);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+      position: relative;
+      padding: 0 1px;
+      min-width: 0;
+    }
+
+    .nav-tab-btn svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2.2;
+      transition: stroke 0.15s ease, transform 0.15s ease;
+    }
+
+    .nav-tab-btn.active {
+      color: var(--cyan);
+    }
+
+    .nav-tab-btn.active svg {
+      stroke: var(--cyan);
+      transform: scale(1.1);
+    }
+
+    .nav-tab-btn.active::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 2px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    .nav-alert-dot {
+      position: absolute;
+      top: 8px;
+      right: calc(50% - 14px);
+      width: 8px;
+      height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--red);
+      display: none;
+    }
+
+    /* REVENUE FLOAT PARTICLES */
+    .float-particle {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.85rem;
+      pointer-events: none;
+      animation: floatUp 1.1s ease-out forwards;
+      z-index: 999;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-45px) scale(1.15); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-root">
+
+    <!-- TOP LIVE CLOCK & SIM SPEED BAR -->
+    <header class="top-live-bar">
+      <div class="brand-clock-group">
+        <div class="live-day-badge">
+          <span>DAY</span>
+          <span id="liveDayNum">1</span>
+        </div>
+        <div class="live-date-sub" id="liveCalendarText">YEAR 1 · Q1</div>
+      </div>
+
+      <div class="time-control-group">
+        <button class="btn-speed" id="btnSpeedPause">⏸</button>
+        <button class="btn-speed active" id="btnSpeed1x">1X</button>
+        <button class="btn-speed" id="btnSpeed2x">2X</button>
+        <button class="btn-speed" id="btnSpeed4x">4X</button>
+        <button class="btn-audio" id="btnAudioToggle">🔊</button>
+      </div>
+    </header>
+
+    <!-- LIVE NEVER-ENDING HUD GAUGES -->
+    <section class="hud-gauges-grid" aria-label="Live Resource HUD">
+      
+      <!-- Cash Gauge -->
+      <div class="hud-box" id="boxCash">
+        <div class="hud-box-top">
+          <span>Runway Cash</span>
+          <span id="cashBurnPill" class="flow-pos">+$2.4k/day</span>
+        </div>
+        <div class="hud-box-val" id="valCash">$150,000</div>
+        <div class="hud-box-sub">
+          <span class="text-dark">Net Daily Flow</span>
+          <span id="valValuation" style="color: var(--cyan);">$12M VAL</span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-fill" id="fillCash" style="width: 50%; background: var(--green);"></div>
+        </div>
+      </div>
+
+      <!-- Server Load Gauge -->
+      <div class="hud-box" id="boxLoad">
+        <div class="hud-box-top">
+          <span>Server Load</span>
+          <span id="loadStatusPill" class="flow-pos">NOMINAL</span>
+        </div>
+        <div class="hud-box-val" id="valLoad">20%</div>
+        <div class="hud-box-sub">
+          <span class="text-dark">Active Users</span>
+          <span id="valUsers" style="color: #fff;">15,400</span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-fill" id="fillLoad" style="width: 20%; background: var(--cyan);"></div>
+        </div>
+      </div>
+
+      <!-- AI Quality / Benchmark -->
+      <div class="hud-box" id="boxQuality">
+        <div class="hud-box-top">
+          <span>AI Intelligence</span>
+          <span id="qualityRankPill" style="color: var(--purple);">RANK #3</span>
+        </div>
+        <div class="hud-box-val" id="valQuality">45.0 <span style="font-size: 0.8rem; color: var(--text-dark);">IQ</span></div>
+        <div class="hud-box-sub">
+          <span class="text-dark">Model Version</span>
+          <span id="valModelVer" style="color: var(--purple);">SYNAPSE-v1</span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-fill" id="fillQuality" style="width: 45%; background: var(--purple);"></div>
+        </div>
+      </div>
+
+      <!-- Public Trust Gauge -->
+      <div class="hud-box" id="boxTrust">
+        <div class="hud-box-top">
+          <span>Public Trust</span>
+          <span id="trustStatusPill" class="flow-pos">HIGH</span>
+        </div>
+        <div class="hud-box-val" id="valTrust">65%</div>
+        <div class="hud-box-sub">
+          <span class="text-dark">Ethics Rating</span>
+          <span id="valLegalRisk" style="color: var(--green);">SECURE</span>
+        </div>
+        <div class="gauge-track">
+          <div class="gauge-fill" id="fillTrust" style="width: 65%; background: var(--green);"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- LIVE BREAKING NEWS TICKER -->
+    <div class="breaking-ticker">
+      <span class="ticker-tag">LIVE WIRE</span>
+      <span class="ticker-content" id="tickerText">Apex AI announces closed beta for 1M context multimodal reasoning cluster...</span>
+    </div>
+
+    <!-- MAIN ACTIVE VIEWPORT TABS -->
+    <main class="tab-content-area">
+
+      <!-- TAB 1: DATACENTER & OPERATIONS (DEFAULT) -->
+      <section class="tab-pane active" id="paneDatacenter">
+        
+        <div class="datacenter-card">
+          <div class="datacenter-header">
+            <div class="datacenter-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+                <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+                <circle cx="6" cy="6" r="1"></circle>
+                <circle cx="6" cy="18" r="1"></circle>
+              </svg>
+              <span>San Francisco GPU Pod Alpha</span>
+            </div>
+            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--cyan);" id="datacenterMetrics">
+              CAPACITY: 50,000 CONCURRENT
+            </span>
+          </div>
+
+          <!-- Real-Time Graphical 2D Server Rack Canvas with Tap Clicker -->
+          <div class="rack-canvas-wrapper" id="serverCanvasWrapper" title="Tap repeatedly to train tokens & compute!">
+            <span class="rack-click-hint">⚡ TAP TO TRAIN</span>
+            <div class="combo-badge" id="comboBadge">2X COMBO!</div>
+            <canvas id="serverCanvas"></canvas>
+          </div>
+
+          <!-- Tap Action Button -->
+          <div class="tap-action-strip">
+            <button class="btn-tap-compute" id="btnBigTapCompute">
+              <span>⚡ TRAIN MODEL TOKENS (TAP)</span>
+              <span style="font-size: 0.75rem; color: var(--cyan);" id="tapBonusText">+$250 / +20 Tokens</span>
+            </button>
+          </div>
+
+          <!-- Interactive Emergency Tactical Ops -->
+          <div class="datacenter-quick-actions">
+            <button class="btn-quick-ops" id="btnFlushCache">
+              <span>🧹 Flush Cache</span>
+              <span class="btn-quick-ops-cost">-15% Load (Free)</span>
+            </button>
+            <button class="btn-quick-ops" id="btnTurboOverclock">
+              <span>⚡ Turbo Overclock</span>
+              <span class="btn-quick-ops-cost">+25% Rev / +15% Load</span>
+            </button>
+            <button class="btn-quick-ops" id="btnEmergencyCredits">
+              <span>💳 Emergency Cloud</span>
+              <span class="btn-quick-ops-cost">-$15,000 / -30% Load</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Executive Talent / Specialist Team -->
+        <div class="datacenter-card">
+          <div class="datacenter-header">
+            <div class="datacenter-title" style="color: var(--purple);">
+              <span>⭐ Executive 10x Talent Suite</span>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-dark);" id="talentCountText">0 / 4 Specialists</span>
+          </div>
+
+          <div class="specialists-grid" id="specialistsGrid">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Real-Time Mini Competitor Glance on Dashboard -->
+        <div class="race-track-card" style="margin-bottom: 1rem;">
+          <div class="race-header">
+            <span>🏁 Frontier AGI Race Standings</span>
+            <span style="color: var(--cyan); cursor: pointer;" id="btnViewFullRace">Expand Race →</span>
+          </div>
+
+          <div id="miniRaceRows" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <!-- Dynamic mini rows -->
+          </div>
+        </div>
+
+        <!-- Safe Bottom Clearance Spacer -->
+        <div style="height: 4.5rem; width: 100%; pointer-events: none;" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- TAB 2: TECH UPGRADES & HEADQUARTERS -->
+      <section class="tab-pane" id="paneUpgrades">
+        
+        <div class="upgrades-header-summary">
+          <span>INVEST CAPITAL IN NEXT-GEN R&D</span>
+          <span style="color: var(--green);" id="upgradesTotalPurchased">0 / 16 UPGRADES UNLOCKED</span>
+        </div>
+
+        <div class="department-grid" id="upgradeCardsGrid">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Safe Bottom Clearance Spacer -->
+        <div style="height: 4.5rem; width: 100%; pointer-events: none;" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- TAB 3: FULL COMPETITOR RACE & SABOTAGE TRACK -->
+      <section class="tab-pane" id="paneRace">
+        
+        <div class="race-track-card" style="margin-bottom: 1rem;">
+          <div class="race-header">
+            <span>Global AI Hegemony Index & Espionage</span>
+            <span style="color: var(--cyan);">LIVE EVALUATION</span>
+          </div>
+
+          <div style="font-size: 0.75rem; color: var(--text-mid); line-height: 1.4;">
+            Race rival AI titans to Market Dominance and 100% AGI. Use corporate espionage to poach talent, leak rival benchmarks, or execute a hostile takeover.
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;" id="fullRaceRows">
+            <!-- Full competitor breakdown rows with sabotage actions -->
+          </div>
+        </div>
+
+        <!-- Safe Bottom Clearance Spacer -->
+        <div style="height: 4.5rem; width: 100%; pointer-events: none;" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- TAB 4: WAR ROOM: GLOBAL CONQUEST & WORLD DOMINATION -->
+      <section class="tab-pane" id="paneConquest">
+        
+        <!-- Top DEFCON Status Strip -->
+        <div class="war-status-card">
+          <div class="defcon-bar-top">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="defcon-pill" id="defconPillText">🔴 DEFCON 1: ACTIVE WAR</span>
+              <span style="font-size: 0.72rem; color: var(--text-dark); font-family: var(--font-mono);" id="warAscensionBadge">TIER 1 PLANETARY CAMPAIGN</span>
+            </div>
+            <div style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--gold); font-weight: 800;" id="warConquestRatio">
+              0 / 12 SECTORS CONQUERED (0%)
+            </div>
+          </div>
+
+          <div class="war-stats-strip">
+            <div class="war-stat-box">
+              <span class="war-stat-label">Military Army Power</span>
+              <span class="war-stat-val" style="color: var(--cyan);" id="warTotalPower">0 POWER</span>
+            </div>
+            <div class="war-stat-box">
+              <span class="war-stat-label">Daily War Tribute</span>
+              <span class="war-stat-val" style="color: var(--green);" id="warDailyTribute">+$0 / DAY</span>
+            </div>
+            <div class="war-stat-box">
+              <span class="war-stat-label">Total Loot Won</span>
+              <span class="war-stat-val" style="color: var(--gold);" id="warTotalLoot">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Holographic Map Canvas (Risk & DEFCON Style) -->
+        <div class="war-map-card">
+          <div class="war-map-header">
+            <span>🌐 Planetary Strategic Hologrid · Touch Sector To Target</span>
+            <span style="color: var(--red); font-size: 0.7rem;" id="mapTargetStatus">STANDBY</span>
+          </div>
+
+          <div class="war-canvas-container" id="warCanvasWrapper">
+            <canvas id="warMapCanvas"></canvas>
+          </div>
+
+          <!-- Sector Quick Selector Strip -->
+          <div class="sector-chips-scroll" id="sectorChipsList">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Target Sector Intel Dossier & Launch Button -->
+        <div class="sector-dossier-card" id="sectorDossierCard">
+          <div class="dossier-header-row">
+            <div>
+              <div class="dossier-title" id="dossierSectorName">Silicon Valley Core</div>
+              <div style="font-size: 0.72rem; color: var(--text-mid); font-family: var(--font-mono);" id="dossierRegion">North America West</div>
+            </div>
+            <div id="dossierStatusBadge" style="font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: rgba(255, 42, 85, 0.2); color: var(--red); border: 1px solid var(--red);">
+              HOSTILE FORTRESS
+            </div>
+          </div>
+
+          <div class="dossier-grid">
+            <div class="dossier-item">
+              <span class="dossier-lbl">Hostile Controller</span>
+              <span class="dossier-val" id="dossierController" style="color: #ff6b8b;">DARPA AI Directorate</span>
+            </div>
+            <div class="dossier-item">
+              <span class="dossier-lbl">Garrison Defense Power</span>
+              <span class="dossier-val" id="dossierDefensePower" style="color: var(--red);">1,200 POWER</span>
+            </div>
+            <div class="dossier-item">
+              <span class="dossier-lbl">Daily Tribute Reward</span>
+              <span class="dossier-val" id="dossierTributeReward" style="color: var(--green);">+$15,000 / day</span>
+            </div>
+            <div class="dossier-item">
+              <span class="dossier-lbl">Strategic Perk</span>
+              <span class="dossier-val" id="dossierPerkName" style="color: var(--cyan);">+20% Valuation Multiplier</span>
+            </div>
+          </div>
+
+          <div id="dossierActionContainer">
+            <button class="btn-invade-primary" id="btnLaunchInvasion">
+              <span>⚔️ COMMENCE MILITARY INVASION</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Combat Simulator Panel (Visible during active battle) -->
+        <div class="combat-simulator-panel" id="combatSimulatorPanel" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.85rem; font-weight: 900; color: var(--red); letter-spacing: 0.05em; font-family: var(--font-mono);">
+              🔥 DEFCON 1 BATTLE IN PROGRESS: <span id="combatSectorTitle">SECTOR</span>
+            </span>
+            <span style="font-size: 0.72rem; color: #fff; font-family: var(--font-mono);" id="combatTimeRemaining">ENGAGING</span>
+          </div>
+
+          <div class="combat-bars-row">
+            <div class="combat-bar-wrapper">
+              <div class="combat-bar-info">
+                <span style="color: var(--cyan);">YOUR CYBER-ARMY HULL</span>
+                <span id="playerHpText" style="color: var(--cyan);">100%</span>
+              </div>
+              <div class="combat-track">
+                <div class="combat-fill-player" id="playerHpBar" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <div class="combat-bar-wrapper">
+              <div class="combat-bar-info">
+                <span style="color: var(--red);">HOSTILE FORTRESS SHIELD</span>
+                <span id="enemyHpText" style="color: var(--red);">100%</span>
+              </div>
+              <div class="combat-track">
+                <div class="combat-fill-enemy" id="enemyHpBar" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tactical Strike Actions -->
+          <div style="font-size: 0.68rem; font-family: var(--font-mono); color: var(--gold); font-weight: 800; text-transform: uppercase;">
+            ⚡ Direct Runway Cash Tactical Call-Ins:
+          </div>
+          <div class="combat-tactical-actions">
+            <button class="btn-tactical" id="btnTacEmp">
+              <span>⚡ EMP Wave</span>
+              <span style="color: var(--cyan);">-$50k / -25% Shield</span>
+            </button>
+            <button class="btn-tactical" id="btnTacDive">
+              <span>🚀 Drone Dive</span>
+              <span style="color: var(--amber);">-$100k / Heavy Crit</span>
+            </button>
+            <button class="btn-tactical" id="btnTacNuke">
+              <span>🛰️ Kinetic Nuke</span>
+              <span style="color: var(--red);">-$500k / -50% Shield</span>
+            </button>
+          </div>
+
+          <!-- Live Battle Log Stream -->
+          <div class="combat-log-stream" id="battleLogStream">
+            <div>[DEFCON 1] Tactical comms link established. Awaiting bombardment orders...</div>
+          </div>
+
+          <button class="btn-sabotage" id="btnRetreatBattle" style="width: 100%; padding: 0.5rem; text-align: center; color: var(--text-mid);">
+            🏳️ Tactical Fallback & Regroup
+          </button>
+        </div>
+
+        <!-- Military Foundry / Runway Cash Sink -->
+        <div class="military-foundry-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.4rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem;">
+              <span style="color: var(--red); font-size: 1.1rem;">🏭</span>
+              <span style="font-size: 0.85rem; font-weight: 800; color: #fff; letter-spacing: 0.05em; text-transform: uppercase;">
+                Autonomous Military Foundry
+              </span>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-mid); font-family: var(--font-mono);">
+              PROCURE ARMY USING RUNWAY CASH
+            </span>
+          </div>
+
+          <div class="units-market-grid" id="unitsMarketGrid">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Planetary Ascension (Visible once 12/12 sectors conquered) -->
+        <div class="war-status-card" id="planetaryAscensionBox" style="display: none; border-color: var(--gold); box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.95rem; font-weight: 900; color: var(--gold); letter-spacing: 0.06em;">
+              👑 PLANETARY DOMINATION UNLOCKED
+            </span>
+            <span style="font-size: 0.75rem; color: var(--green); font-family: var(--font-mono); font-weight: 800;">
+              EARTH PACIFIED
+            </span>
+          </div>
+          <div style="font-size: 0.75rem; color: #cbd5e1; line-height: 1.4;">
+            All 12 strategic sectors are under your autonomous command. You can trigger Planetary Ascension to face elite rogue synthetic hives with 2.5x defense power and double (2x) permanent daily war tribute!
+          </div>
+          <button class="btn-invade-primary" id="btnAscendPlanet" style="background: linear-gradient(135deg, #ffd700, #ff5c00); color: #000; font-weight: 900;">
+            🌌 TRIGGER PLANETARY ASCENSION (TIER +1)
+          </button>
+        </div>
+
+        <!-- Safe Bottom Clearance Spacer -->
+        <div style="height: 4.5rem; width: 100%; pointer-events: none;" aria-hidden="true"></div>
+
+      </section>
+
+      <!-- TAB 5: EXECUTIVE DESK & DECREES LOG -->
+      <section class="tab-pane" id="paneDecrees">
+        <div class="datacenter-card" style="margin-bottom: 1rem;">
+          <div class="datacenter-header">
+            <span class="datacenter-title">Executive Action History</span>
+            <span style="font-size: 0.72rem; color: var(--text-dark);" id="decreeCount">0 Decrees Enacted</span>
+          </div>
+
+          <div id="decreeLogList" style="display: flex; flex-direction: column; gap: 0.5rem; max-height: 400px; overflow-y: auto;">
+            <div style="text-align: center; color: var(--text-dark); padding: 2rem; font-size: 0.8rem;">
+              No executive orders issued yet. As days progress, breaking dilemmas will arrive at your desk.
+            </div>
+          </div>
+        </div>
+
+        <!-- Safe Bottom Clearance Spacer -->
+        <div style="height: 4.5rem; width: 100%; pointer-events: none;" aria-hidden="true"></div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM MOBILE NAVIGATION DOCK -->
+    <nav class="bottom-nav-bar" aria-label="Main Navigation">
+      <button class="nav-tab-btn active" data-tab="paneDatacenter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+          <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+          <line x1="6" y1="6" x2="6.01" y2="6"></line>
+          <line x1="6" y1="18" x2="6.01" y2="18"></line>
+        </svg>
+        <span>Operations</span>
+      </button>
+
+      <button class="nav-tab-btn" data-tab="paneUpgrades">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+        </svg>
+        <span>Upgrades</span>
+      </button>
+
+      <button class="nav-tab-btn" data-tab="paneRace">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+          <line x1="4" y1="22" x2="4" y2="15"></line>
+        </svg>
+        <span>AI Race</span>
+      </button>
+
+      <button class="nav-tab-btn" data-tab="paneConquest">
+        <div class="nav-alert-dot" id="warAlertDot" style="background: var(--red); display: none;"></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>War Room</span>
+      </button>
+
+      <button class="nav-tab-btn" data-tab="paneDecrees">
+        <div class="nav-alert-dot" id="decreeAlertDot"></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+        <span>Decrees</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- MR. PRESIDENT TINDER / REIGNS SWIPEABLE CRISIS CARD MODAL -->
+  <div class="crisis-modal-overlay" id="crisisModal">
+    <div class="swipe-container">
+      
+      <div class="crisis-card" id="swipeCrisisCard">
+        <!-- Dynamic Swipe Feedback Stamps -->
+        <div class="swipe-stamp stamp-approve" id="stampApprove">APPROVE</div>
+        <div class="swipe-stamp stamp-veto" id="stampVeto">VETO</div>
+
+        <div class="crisis-top-banner">
+          <span class="crisis-badge" id="crisisBadge">🚨 PRESIDENTIAL URGENT DECREE</span>
+          <span style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--text-dark);" id="crisisDayTag">DAY 14</span>
+        </div>
+
+        <h2 class="crisis-headline" id="crisisHeadline">Lucrative Defense Contract Inflow</h2>
+        <p class="crisis-body" id="crisisBody">
+          A military contractor offers a $40,000 pilot contract to tune your natural language model for automated battlefield reconnaissance. Several core researchers threaten a walkout.
+        </p>
+
+        <div class="swipe-instruction-hint">
+          <span>👈 Swipe Left to Veto</span>
+          <span>•</span>
+          <span>Swipe Right to Approve 👉</span>
+        </div>
+
+        <div class="crisis-choices-grid">
+          <button class="btn-crisis-choice" id="btnCrisisB">
+            <span class="choice-label" style="color: var(--red);">VETO DECREE [👈 LEFT]</span>
+            <span class="choice-text" id="crisisOptBText">Enact ethical charter barring military applications</span>
+            <div class="choice-effects-strip" id="crisisOptBEff"></div>
+          </button>
+
+          <button class="btn-crisis-choice" id="btnCrisisA">
+            <span class="choice-label" style="color: var(--green);">APPROVE DECREE [RIGHT 👉]</span>
+            <span class="choice-text" id="crisisOptAText">Sign defense subcontract for immediate cash injection</span>
+            <div class="choice-effects-strip" id="crisisOptAEff"></div>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FRONT PAGE NEWSPAPER BREAKTHROUGH MODAL WITH CONFETTI -->
+  <div class="celebration-modal-overlay" id="celebrationModal">
+    <canvas id="confettiCanvas"></canvas>
+    
+    <div class="newspaper-card">
+      <div class="newspaper-header">
+        <div class="newspaper-masthead">The Silicon Chronicle</div>
+        <div class="newspaper-date-line">
+          <span id="newsDayStamp">SPECIAL EDITION · DAY 42</span>
+          <span>SAN FRANCISCO, CA</span>
+          <span>VALUATION: RECORD BREAKING</span>
+        </div>
+      </div>
+
+      <h1 class="newspaper-headline" id="newsHeadline">SYNAPSE DYNAMICS BREACHES $1 BILLION UNICORN STATUS</h1>
+      
+      <p class="newspaper-article" id="newsArticle">
+        In an extraordinary market ascendancy, Synapse Dynamics has shattered Silicon Valley velocity benchmarks. Institutional venture capital and enterprise cloud buyers have propelled the frontier laboratory to historic valuations.
+      </p>
+
+      <button class="btn-claim-hype" id="btnClaimCelebration">
+        CLAIM MILESTONE & RESUME COMMAND
+      </button>
+    </div>
+  </div>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    /* ==========================================================================
+       1. GAME DATA: UPGRADES, SPECIALISTS, AND CRISES
+       ========================================================================== */
+    const UPGRADES_DB = [
+      // Department 1: Compute Infrastructure
+      {
+        id: 'comp_1',
+        name: 'Burstable Spot Instances',
+        dept: 'Compute',
+        cost: 15000,
+        unlocked: false,
+        desc: 'Dynamic cloud spot instances to absorb sudden traffic spikes.',
+        benefits: ['+100k User Cap', '-10% Server Load'],
+        apply: (s) => { s.userCapacity += 100000; s.serverLoad = Math.max(5, s.serverLoad - 10); }
+      },
+      {
+        id: 'comp_2',
+        name: 'Dedicated H100 Cluster',
+        dept: 'Compute',
+        cost: 45000,
+        unlocked: false,
+        desc: 'High-bandwidth tensor core racks with uninterrupted SLAs.',
+        benefits: ['+400k User Cap', '-20% Server Load', '+5 AI IQ'],
+        apply: (s) => { s.userCapacity += 400000; s.serverLoad = Math.max(5, s.serverLoad - 20); s.aiQuality += 5; }
+      },
+      {
+        id: 'comp_3',
+        name: 'Liquid-Cooled Pods',
+        dept: 'Compute',
+        cost: 130000,
+        unlocked: false,
+        desc: 'Custom immersed cooling racks with ultra-low thermal throttling.',
+        benefits: ['+1.5M User Cap', '-25% Server Load', '+10 AI IQ'],
+        apply: (s) => { s.userCapacity += 1500000; s.serverLoad = Math.max(5, s.serverLoad - 25); s.aiQuality += 10; }
+      },
+      {
+        id: 'comp_4',
+        name: 'Quantum Supercomputer Node',
+        dept: 'Compute',
+        cost: 400000,
+        unlocked: false,
+        desc: 'Cryogenic quantum annealer speeding up recursive weight search.',
+        benefits: ['+5M User Cap', '-35% Server Load', '+25 AI IQ'],
+        apply: (s) => { s.userCapacity += 5000000; s.serverLoad = Math.max(5, s.serverLoad - 35); s.aiQuality += 25; }
+      },
+
+      // Department 2: AI Research Lab
+      {
+        id: 'ai_1',
+        name: 'Chain-of-Thought Routing',
+        dept: 'AI Lab',
+        cost: 12000,
+        unlocked: false,
+        desc: 'Dynamic inference compute allocation on complex queries.',
+        benefits: ['+8 AI IQ', '+$800/day Rev'],
+        apply: (s) => { s.aiQuality += 8; s.baseRevenuePerUser *= 1.15; }
+      },
+      {
+        id: 'ai_2',
+        name: 'Mixture-of-Experts (MoE)',
+        dept: 'AI Lab',
+        cost: 50000,
+        unlocked: false,
+        desc: 'Sparse routing activating only relevant neural expert blocks.',
+        benefits: ['+15 AI IQ', '-15% Server Load', '+$2.5k/day Rev'],
+        apply: (s) => { s.aiQuality += 15; s.serverLoad = Math.max(5, s.serverLoad - 15); s.baseRevenuePerUser *= 1.25; }
+      },
+      {
+        id: 'ai_3',
+        name: 'Synthetic Self-Play Engine',
+        dept: 'AI Lab',
+        cost: 150000,
+        unlocked: false,
+        desc: 'AlphaZero-style self-critique loop eliminating hallucinations.',
+        benefits: ['+22 AI IQ', '+10 Public Trust'],
+        apply: (s) => { s.aiQuality += 22; s.publicTrust = Math.min(100, s.publicTrust + 10); }
+      },
+      {
+        id: 'ai_4',
+        name: 'Autonomous Neural Synthesizer',
+        dept: 'AI Lab',
+        cost: 450000,
+        unlocked: false,
+        desc: 'AI that writes superior successor architectures without humans.',
+        benefits: ['+35 AI IQ', '+35% AGI Progress'],
+        apply: (s) => { s.aiQuality += 35; s.agiProgress += 35; }
+      },
+
+      // Department 3: Growth & Monetization
+      {
+        id: 'growth_1',
+        name: 'Viral Developer SDK',
+        dept: 'Growth',
+        cost: 10000,
+        unlocked: false,
+        desc: 'Open-source Python and TypeScript client packages.',
+        benefits: ['+50,000 Dev Users', '+$1,500/day Rev'],
+        apply: (s) => { s.activeUsers += 50000; s.dailyUserGrowth += 400; }
+      },
+      {
+        id: 'growth_2',
+        name: 'Enterprise Tier & Dedicated SLA',
+        dept: 'Growth',
+        cost: 40000,
+        unlocked: false,
+        desc: 'SOC2-compliant enterprise cloud gateways for Fortune 500s.',
+        benefits: ['+250,000 Users', '+$6,000/day Rev'],
+        apply: (s) => { s.activeUsers += 250000; s.dailyUserGrowth += 1800; }
+      },
+      {
+        id: 'growth_3',
+        name: 'Global SaaS Ecosystem Hub',
+        dept: 'Growth',
+        cost: 120000,
+        unlocked: false,
+        desc: 'Native integrations into Slack, Google Workspace, and Microsoft 365.',
+        benefits: ['+1M Users', '+$18,000/day Rev'],
+        apply: (s) => { s.activeUsers += 1000000; s.dailyUserGrowth += 6000; }
+      },
+      {
+        id: 'growth_4',
+        name: 'Trillion-Token Enterprise Monopoly',
+        dept: 'Growth',
+        cost: 380000,
+        unlocked: false,
+        desc: 'Default AI inference backbone powering global banking & tech.',
+        benefits: ['+4M Users', '+$50,000/day Rev'],
+        apply: (s) => { s.activeUsers += 4000000; s.dailyUserGrowth += 20000; }
+      },
+
+      // Department 4: PR, Trust & Security
+      {
+        id: 'trust_1',
+        name: 'Executive PR War Room',
+        dept: 'Security',
+        cost: 12000,
+        unlocked: false,
+        desc: '24/7 crisis communication desk countering bad press.',
+        benefits: ['+15 Public Trust', '-50% Scandal Severity'],
+        apply: (s) => { s.publicTrust = Math.min(100, s.publicTrust + 15); }
+      },
+      {
+        id: 'trust_2',
+        name: 'Zero-Trust Cryptographic Enclave',
+        dept: 'Security',
+        cost: 35000,
+        unlocked: false,
+        desc: 'Hardware security modules preventing internal prompt leakages.',
+        benefits: ['+20 Public Trust', 'Outage Immunity'],
+        apply: (s) => { s.publicTrust = Math.min(100, s.publicTrust + 20); }
+      },
+      {
+        id: 'trust_3',
+        name: 'Washington AI Policy PAC',
+        dept: 'Security',
+        cost: 110000,
+        unlocked: false,
+        desc: 'Influential lobbying team shaping favorable regulatory charters.',
+        benefits: ['+25 Public Trust', 'Antitrust Shield'],
+        apply: (s) => { s.publicTrust = Math.min(100, s.publicTrust + 25); }
+      },
+      {
+        id: 'trust_4',
+        name: 'Perpetual Alignment Endowment',
+        dept: 'Security',
+        cost: 320000,
+        unlocked: false,
+        desc: 'Independent university grant ensuring benevolent AI progress.',
+        benefits: ['+35 Public Trust', 'AGI Safety Seal'],
+        apply: (s) => { s.publicTrust = Math.min(100, s.publicTrust + 35); }
+      }
+    ];
+
+    const SPECIALISTS_DB = [
+      {
+        id: 'spec_1',
+        name: 'Alex "Zero-Day" Chen',
+        role: 'Kernel Wizard',
+        avatar: '🧙‍♂️',
+        cost: 25000,
+        hired: false,
+        perk: '-20% Server Load · +2x Tap Compute Cash',
+        apply: (s) => { s.serverLoad = Math.max(5, s.serverLoad - 20); s.tapMultiplier *= 2; }
+      },
+      {
+        id: 'spec_2',
+        name: 'Dr. Elena Rostova',
+        role: 'Chief AI Ethicist',
+        avatar: '👩‍⚖️',
+        cost: 30000,
+        hired: false,
+        perk: '+20 Public Trust · Scandal Immunity',
+        apply: (s) => { s.publicTrust = Math.min(100, s.publicTrust + 20); s.trustShield = true; }
+      },
+      {
+        id: 'spec_3',
+        name: 'Sterling Vance',
+        role: 'Wall St. Rainmaker',
+        avatar: '💼',
+        cost: 55000,
+        hired: false,
+        perk: '+50% Valuation Multiplier · +$3k/day Rev',
+        apply: (s) => { s.valuationMultiplier *= 1.5; s.baseRevenuePerUser *= 1.3; }
+      },
+      {
+        id: 'spec_4',
+        name: 'Dr. Kenji Sato',
+        role: 'AGI Singularity Lead',
+        avatar: '🧬',
+        cost: 80000,
+        hired: false,
+        perk: '+50% AGI Research Speed · +15 AI IQ',
+        apply: (s) => { s.aiQuality += 15; s.agiSpeedMultiplier *= 1.5; }
+      }
+    ];
+
+    const CRISIS_EVENTS = [
+      {
+        headline: "Viral Deepfake Election Scandal",
+        body: "A viral political deepfake generated using your open audio API sparked international panic. Regulators threaten immediate emergency operational shutdowns.",
+        optA_text: "Deploy biometric watermarking & strict identity filters",
+        optA_effect: { cash: -25000, serverLoad: -10, aiQuality: 5, publicTrust: 25 },
+        optB_text: "Defend technological neutrality and ignore state orders",
+        optB_effect: { cash: 20000, serverLoad: 15, aiQuality: -5, publicTrust: -30 }
+      },
+      {
+        headline: "Lucrative Defense Subcontract",
+        body: "A defense agency offers a non-dilutive $50,000 contract to adapt your vision model for autonomous drone navigation. Several core researchers threaten a walkout.",
+        optA_text: "Sign defense contract to supercharge runway treasury",
+        optA_effect: { cash: 50000, serverLoad: 10, aiQuality: 10, publicTrust: -25 },
+        optB_text: "Enact ethical charter barring all military operations",
+        optB_effect: { cash: -20000, serverLoad: -5, aiQuality: -5, publicTrust: 25 }
+      },
+      {
+        headline: "Rogue Distillation Bot Infiltration",
+        body: "Telemetry reveals rival Apex AI is systematically sending millions of automated queries to steal your latest reasoning model weights.",
+        optA_text: "Poison outputs with subtle stochastic mathematical anomalies",
+        optA_effect: { cash: 10000, serverLoad: -15, aiQuality: -8, publicTrust: -10 },
+        optB_text: "File multimillion-dollar federal trade secret injunction",
+        optB_effect: { cash: -35000, serverLoad: 0, aiQuality: 5, publicTrust: 15 }
+      },
+      {
+        headline: "Catastrophic S3 Data Bucket Exposure",
+        body: "A pipeline configuration glitch exposed private employee Slack messages and unreleased research weights to anonymous forum scrapers.",
+        optA_text: "Scrap corrupted checkpoint and retrain from clean backups",
+        optA_effect: { cash: -40000, serverLoad: -20, aiQuality: 10, publicTrust: 20 },
+        optB_text: "Deploy emergency regex censorship filters and ignore leak",
+        optB_effect: { cash: 15000, serverLoad: 15, aiQuality: -12, publicTrust: -30 }
+      },
+      {
+        headline: "Autonomous Warehouse Robot Strike",
+        body: "Over 5,000 warehouse workers walk out on strike to protest physical humanoid robot deployment. Union demands an automation moratorium.",
+        optA_text: "Deploy 24/7 robot scabs to keep supply logistics flowing",
+        optA_effect: { cash: 65000, serverLoad: 20, aiQuality: -5, publicTrust: -35 },
+        optB_text: "Sign co-robotic retraining treaty and pension guarantees",
+        optB_effect: { cash: -50000, serverLoad: -15, aiQuality: 10, publicTrust: 30 }
+      },
+      {
+        headline: "Recursive Singularity Breakthrough",
+        body: "Your autonomous neural synthesizer has begun generating recursive successor circuits beyond human comprehension. The singularity is within reach.",
+        optA_text: "Remove emergency air-gaps to trigger exponential AGI",
+        optA_effect: { cash: 80000, serverLoad: 35, aiQuality: 25, publicTrust: -30 },
+        optB_text: "Enforce strict physical air-gaps and formal cryptographic containment",
+        optB_effect: { cash: -60000, serverLoad: -25, aiQuality: 10, publicTrust: 35 }
+      }
+    ];
+
+    /* ==========================================================================
+       2. GLOBAL STATE
+       ========================================================================== */
+    const state = {
+      day: 1,
+      simSpeed: 1, // 0 = pause, 1 = 1x (2.2s), 2 = 2x (1.1s), 4 = 4x (0.55s)
+      audioEnabled: true,
+
+      // Resources
+      cash: 150000,
+      activeUsers: 15400,
+      userCapacity: 60000,
+      dailyUserGrowth: 650,
+      baseRevenuePerUser: 0.16,
+      serverLoad: 20,
+      aiQuality: 45.0,
+      publicTrust: 65,
+      agiProgress: 15.0,
+
+      // Multipliers & Perks
+      tapMultiplier: 1,
+      valuationMultiplier: 1.0,
+      agiSpeedMultiplier: 1.0,
+      trustShield: false,
+      valuation: 12000000,
+      consecutiveOverloadDays: 0,
+      decreeHistory: [],
+
+      // Tap clicker combo
+      lastTapTime: 0,
+      comboCount: 1,
+
+      // Competitors
+      competitors: [
+        { id: 'apex', name: 'Apex AI', rank: 1, val: 84000000000, agi: 48.0, color: '#00f0ff', defeated: false },
+        { id: 'deep', name: 'DeepOmni', rank: 2, val: 65000000000, agi: 42.0, color: '#ff2a55', defeated: false },
+        { id: 'player', name: 'Synapse (You)', rank: 3, val: 12000000, agi: 15.0, color: '#b800ff', defeated: false },
+        { id: 'neuro', name: 'NeuroCore', rank: 4, val: 9500000, agi: 28.0, color: '#00ff88', defeated: false }
+      ],
+
+      // Milestone flags
+      milestones: {
+        seriesB: false, // $100M
+        unicorn: false, // $1B
+        decacorn: false, // $10B
+        agi: false // 100% AGI
+      },
+
+      // Global Conquest War Room State
+      warRoom: {
+        standingPower: 0,
+        drones: 0,
+        mechs: 0,
+        cruisers: 0,
+        orbitalLasers: 0,
+        totalTributeCollected: 0,
+        dailyTribute: 0,
+        conqueredCount: 0,
+        selectedSectorId: 'silicon_valley',
+        ascensionTier: 1,
+        activeBattle: null // { sectorId, playerHp, maxPlayerHp, enemyHp, maxEnemyHp, intervalId }
+      }
+    };
+
+    const SECTORS = [
+      {
+        id: 'silicon_valley',
+        name: 'Silicon Valley Core',
+        region: 'North America West',
+        controller: 'DARPA AI Directorate',
+        baseDefense: 1200,
+        currentDefense: 1200,
+        tribute: 15000,
+        lootReward: 250000,
+        perkName: '+20% Startup Valuation',
+        perkDesc: 'Global tech monopolies pledge venture capital.',
+        x: 0.17,
+        y: 0.38,
+        conquered: false
+      },
+      {
+        id: 'pentagon',
+        name: 'Pentagon Cyber-Citadel',
+        region: 'North America East',
+        controller: 'Defense Advanced Command',
+        baseDefense: 2400,
+        currentDefense: 2400,
+        tribute: 25000,
+        lootReward: 500000,
+        perkName: '+25% Drone Assault Power',
+        perkDesc: 'Black-budget autonomous weaponry blueprints.',
+        x: 0.28,
+        y: 0.40,
+        conquered: false
+      },
+      {
+        id: 'amazon_grid',
+        name: 'Amazon Bio-Synthetic Grid',
+        region: 'South America',
+        controller: 'Apex Shadow Cartel',
+        baseDefense: 1800,
+        currentDefense: 1800,
+        tribute: 20000,
+        lootReward: 400000,
+        perkName: '+20% User Traction Growth',
+        perkDesc: 'Unrestricted bio-neural synthetic training pipelines.',
+        x: 0.33,
+        y: 0.70,
+        conquered: false
+      },
+      {
+        id: 'london_frankfurt',
+        name: 'Frankfurt / London FinTech Core',
+        region: 'Western Europe',
+        controller: 'Euro-Central Banking AI',
+        baseDefense: 3500,
+        currentDefense: 3500,
+        tribute: 35000,
+        lootReward: 750000,
+        perkName: '+30% Base Revenue / User',
+        perkDesc: 'Automated algorithmic high-frequency arbitrage tax.',
+        x: 0.48,
+        y: 0.33,
+        conquered: false
+      },
+      {
+        id: 'nordic_vault',
+        name: 'Nordic Geothermal Datacenter',
+        region: 'Northern Europe',
+        controller: 'DeepOmni Sub-Zero Cluster',
+        baseDefense: 4200,
+        currentDefense: 4200,
+        tribute: 40000,
+        lootReward: 900000,
+        perkName: '-35% Server Heat / Load',
+        perkDesc: 'Natural glacial cooling infrastructure eliminating thermal stress.',
+        x: 0.52,
+        y: 0.21,
+        conquered: false
+      },
+      {
+        id: 'sahara_array',
+        name: 'Sahara Quantum Solar Array',
+        region: 'North Africa',
+        controller: 'Pan-African Energy Consortium',
+        baseDefense: 4800,
+        currentDefense: 4800,
+        tribute: 45000,
+        lootReward: 1000000,
+        perkName: 'Zero Cloud Electricity Costs',
+        perkDesc: 'Gigawatt terawatt solar arrays power infinite server inference.',
+        x: 0.49,
+        y: 0.52,
+        conquered: false
+      },
+      {
+        id: 'arabian_fusion',
+        name: 'Arabian Mega-Fusion Syndicate',
+        region: 'Middle East',
+        controller: 'Sovereign Wealth AI Trust',
+        baseDefense: 5800,
+        currentDefense: 5800,
+        tribute: 55000,
+        lootReward: 1250000,
+        perkName: '+50% Tap Cash Multiplier',
+        perkDesc: 'Endless sovereign wealth capital injected into datacenter taps.',
+        x: 0.60,
+        y: 0.47,
+        conquered: false
+      },
+      {
+        id: 'bengaluru_core',
+        name: 'Bengaluru Neural Highway',
+        region: 'South Asia',
+        controller: 'Indus Algorithmic Union',
+        baseDefense: 6800,
+        currentDefense: 6800,
+        tribute: 60000,
+        lootReward: 1500000,
+        perkName: '+100,000 Server User Capacity',
+        perkDesc: 'Massive distributed edge-network nodes across Asia.',
+        x: 0.69,
+        y: 0.54,
+        conquered: false
+      },
+      {
+        id: 'taiwan_strait',
+        name: 'Taiwan Semiconductor Strait',
+        region: 'East Asia',
+        controller: 'Foundry Hegemony Guard',
+        baseDefense: 8000,
+        currentDefense: 8000,
+        tribute: 75000,
+        lootReward: 2000000,
+        perkName: '+100% Token Generation Speed',
+        perkDesc: 'Direct fabrication priority for 1.8nm extreme ultraviolet chips.',
+        x: 0.79,
+        y: 0.48,
+        conquered: false
+      },
+      {
+        id: 'tokyo_megacity',
+        name: 'Tokyo Cybernetics Megacity',
+        region: 'Japan',
+        controller: 'NeuroCore Mech Guild',
+        baseDefense: 9500,
+        currentDefense: 9500,
+        tribute: 90000,
+        lootReward: 2500000,
+        perkName: '+15 AI Model Battle IQ',
+        perkDesc: 'Advanced android humanoid robotics automation algorithms.',
+        x: 0.86,
+        y: 0.39,
+        conquered: false
+      },
+      {
+        id: 'sydney_cable',
+        name: 'Sydney Deep-Ocean Subsea Cable',
+        region: 'Oceania',
+        controller: 'Pacific Trans-Oceanic Transit',
+        baseDefense: 7500,
+        currentDefense: 7500,
+        tribute: 70000,
+        lootReward: 1800000,
+        perkName: '2x Espionage Sabotage Success',
+        perkDesc: 'Interception of all Pacific subsea fiberoptic corporate traffic.',
+        x: 0.86,
+        y: 0.77,
+        conquered: false
+      },
+      {
+        id: 'orbital_platform',
+        name: 'Orbital Defcon Defense Platform',
+        region: 'Low Earth Orbit (Final Citadel)',
+        controller: 'Rogue Planetary Overmind',
+        baseDefense: 15000,
+        currentDefense: 15000,
+        tribute: 150000,
+        lootReward: 5000000,
+        perkName: '👑 PLANETARY HEGEMONY SOVEREIGN',
+        perkDesc: 'Space-based kinetic orbital dominance over all earth datacenters.',
+        x: 0.50,
+        y: 0.10,
+        conquered: false
+      }
+    ];
+
+    const MILITARY_UNITS = [
+      {
+        id: 'drones',
+        name: 'Nano-Drone Swarm (100x)',
+        icon: '🛸',
+        cost: 50000,
+        powerPerPack: 250,
+        desc: 'Autonomous micro-copters equipped with thermite charges.'
+      },
+      {
+        id: 'mechs',
+        name: 'Titan Mech Battalion (20x)',
+        icon: '🤖',
+        cost: 250000,
+        powerPerPack: 1500,
+        desc: 'Titanium bipedal walkers sporting twin 40mm anti-armor railguns.'
+      },
+      {
+        id: 'cruisers',
+        name: 'Electronic Stealth Cruisers (4x)',
+        icon: '🚢',
+        cost: 1000000,
+        powerPerPack: 7000,
+        desc: 'Airborne stealth dreadnoughts broadcasting multi-gigawatt EMP bursts.'
+      },
+      {
+        id: 'orbitalLasers',
+        name: 'Orbital Kinetic Satellites (1x)',
+        icon: '🛰️',
+        cost: 5000000,
+        powerPerPack: 40000,
+        desc: 'Low-Earth orbit tungsten rod railguns with pinpoint kinetic bombardment.'
+      }
+    ];
+
+    /* ==========================================================================
+       3. SYNTHESIZED AUDIO
+       ========================================================================== */
+    let audioCtx = null;
+
+    function playTone(type) {
+      if (!state.audioEnabled) return;
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!audioCtx && AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'coin') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.setValueAtTime(1320, now + 0.05);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'upgrade') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554.37, now + 0.07);
+          osc.frequency.setValueAtTime(659.25, now + 0.14);
+          osc.frequency.setValueAtTime(880, now + 0.21);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'hype') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.12);
+          osc.frequency.setValueAtTime(783.99, now + 0.24);
+          osc.frequency.setValueAtTime(1046.50, now + 0.36);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+          osc.start(now);
+          osc.stop(now + 0.65);
+        } else if (type === 'alert') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.setValueAtTime(240, now + 0.09);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        } else if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(450, now);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'siren') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(450, now);
+          osc.frequency.linearRampToValueAtTime(750, now + 0.25);
+          osc.frequency.linearRampToValueAtTime(450, now + 0.5);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+        } else if (type === 'laser') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(1100, now);
+          osc.frequency.exponentialRampToValueAtTime(120, now + 0.15);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'boom') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+          osc.start(now);
+          osc.stop(now + 0.45);
+        } else if (type === 'nuke') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(200, now);
+          osc.frequency.exponentialRampToValueAtTime(25, now + 0.8);
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+          osc.start(now);
+          osc.stop(now + 0.85);
+        }
+      } catch (e) {}
+    }
+
+    /* ==========================================================================
+       4. GRAPHICAL 2D DATACENTER CANVAS
+       ========================================================================== */
+    const canvas = document.getElementById('serverCanvas');
+    const ctx = canvas.getContext('2d');
+    let fanAngle = 0;
+    let tapRipples = [];
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    setTimeout(resizeCanvas, 50);
+
+    function triggerCanvasTapVisual(clientX, clientY) {
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX ? clientX - rect.left : rect.width / 2;
+      const y = clientY ? clientY - rect.top : rect.height / 2;
+      tapRipples.push({ x, y, radius: 5, alpha: 1 });
+    }
+
+    function renderServerCanvas() {
+      const w = canvas.getBoundingClientRect().width;
+      const h = canvas.getBoundingClientRect().height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Floor grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      for (let y = 0; y < h; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Racks
+      const rackCount = 4;
+      const rackWidth = Math.min(130, (w - 40) / rackCount);
+      const startX = (w - (rackWidth * rackCount + (rackCount - 1) * 12)) / 2;
+
+      fanAngle += (state.serverLoad / 100) * 0.25 + 0.05;
+
+      for (let i = 0; i < rackCount; i++) {
+        const x = startX + i * (rackWidth + 12);
+        const y = 14;
+        const rw = rackWidth;
+        const rh = h - 28;
+
+        ctx.fillStyle = '#0f131f';
+        ctx.fillRect(x, y, rw, rh);
+        ctx.strokeStyle = state.serverLoad > 85 ? 'rgba(255, 42, 85, 0.6)' : 'rgba(0, 240, 255, 0.3)';
+        ctx.strokeRect(x, y, rw, rh);
+
+        const shelves = 4;
+        const shelfH = (rh - 24) / shelves;
+        for (let s = 0; s < shelves; s++) {
+          const sy = y + 8 + s * shelfH;
+          ctx.fillStyle = '#171c2b';
+          ctx.fillRect(x + 4, sy, rw - 8, shelfH - 4);
+
+          const ledX = x + 10;
+          const ledY = sy + shelfH / 2 - 3;
+          const isHot = state.serverLoad > 85;
+          const isWarn = state.serverLoad > 65;
+          const blink = Math.sin(Date.now() * 0.008 + i * 2 + s) > 0;
+
+          ctx.fillStyle = isHot ? (blink ? '#ff2a55' : '#550e1d') : isWarn ? '#ffaa00' : (blink ? '#00ff88' : '#00552b');
+          ctx.beginPath();
+          ctx.arc(ledX, ledY, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = blink ? '#00f0ff' : '#004c55';
+          ctx.beginPath();
+          ctx.arc(ledX + 9, ledY, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          const barW = rw - 45;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+          ctx.fillRect(ledX + 20, ledY - 3, barW, 6);
+
+          const loadRatio = Math.min(1, state.serverLoad / 100);
+          ctx.fillStyle = isHot ? '#ff2a55' : isWarn ? '#ffaa00' : '#00f0ff';
+          ctx.fillRect(ledX + 20, ledY - 3, barW * loadRatio, 6);
+        }
+
+        const fanCX = x + rw / 2;
+        const fanCY = y + rh - 12;
+        ctx.save();
+        ctx.translate(fanCX, fanCY);
+        ctx.rotate(fanAngle);
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, 7, 0, Math.PI * 2);
+        ctx.stroke();
+        for (let b = 0; b < 3; b++) {
+          ctx.rotate((Math.PI * 2) / 3);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, -6);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Render tap ripples
+      for (let r = tapRipples.length - 1; r >= 0; r--) {
+        const rip = tapRipples[r];
+        rip.radius += 3.5;
+        rip.alpha -= 0.05;
+        if (rip.alpha <= 0) {
+          tapRipples.splice(r, 1);
+        } else {
+          ctx.strokeStyle = `rgba(0, 240, 255, ${rip.alpha})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(rip.x, rip.y, rip.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      requestAnimationFrame(renderServerCanvas);
+    }
+    requestAnimationFrame(renderServerCanvas);
+
+    /* ==========================================================================
+       5. FORMATTERS & PARTICLES
+       ========================================================================== */
+    function formatCurrency(n) {
+      if (n >= 1000000000) return '$' + (n / 1000000000).toFixed(2) + 'B';
+      if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+    }
+
+    function formatNumber(n) {
+      return new Intl.NumberFormat('en-US').format(Math.round(n));
+    }
+
+    function spawnFloatParticle(text, x, y, isPos) {
+      const el = document.createElement('div');
+      el.className = 'float-particle';
+      el.textContent = text;
+      el.style.left = (x || (window.innerWidth / 2)) + 'px';
+      el.style.top = (y || 250) + 'px';
+      el.style.color = isPos ? 'var(--green)' : 'var(--red)';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1100);
+    }
+
+    /* ==========================================================================
+       6. TAP TO COMPUTE (CLICKER DOPAMINE ENGINE)
+       ========================================================================== */
+    function handleTapCompute(clientX, clientY) {
+      const now = Date.now();
+      if (now - state.lastTapTime < 900) {
+        state.comboCount = Math.min(5, state.comboCount + 1);
+      } else {
+        state.comboCount = 1;
+      }
+      state.lastTapTime = now;
+
+      // Bonus calculations
+      const baseCash = 250 * state.tapMultiplier;
+      const bonusCash = baseCash * state.comboCount;
+      state.cash += bonusCash;
+      state.aiQuality = Math.min(100, state.aiQuality + 0.05);
+
+      triggerCanvasTapVisual(clientX, clientY);
+
+      // Combo badge UI
+      const comboBadge = document.getElementById('comboBadge');
+      if (state.comboCount > 1) {
+        comboBadge.style.display = 'block';
+        comboBadge.textContent = `${state.comboCount}X COMBO! (+$${bonusCash})`;
+      } else {
+        comboBadge.style.display = 'none';
+      }
+
+      spawnFloatParticle(`+$${bonusCash} ⚡`, clientX, clientY, true);
+      playTone('coin');
+      updateHUD();
+    }
+
+    /* ==========================================================================
+       7. HUD & COMPETITOR LEADERBOARD UPDATE
+       ========================================================================== */
+    function updateHUD() {
+      // Cash & Flow
+      document.getElementById('valCash').textContent = formatCurrency(state.cash);
+      const cashPerc = Math.min(100, Math.max(5, (state.cash / 350000) * 100));
+      document.getElementById('fillCash').style.width = cashPerc + '%';
+      
+      const netDaily = (state.activeUsers * state.baseRevenuePerUser) - (state.userCapacity * 0.04);
+      const cashBurnEl = document.getElementById('cashBurnPill');
+      if (netDaily >= 0) {
+        cashBurnEl.className = 'flow-pos';
+        cashBurnEl.textContent = `+$${Math.round(netDaily)}/day`;
+      } else {
+        cashBurnEl.className = 'flow-neg';
+        cashBurnEl.textContent = `-$${Math.round(Math.abs(netDaily))}/day`;
+      }
+
+      // Valuation
+      state.valuation = Math.max(1000000, Math.round(((state.activeUsers * 130) + (state.cash * 1.6) + (state.aiQuality * 300000)) * state.valuationMultiplier));
+      document.getElementById('valValuation').textContent = formatCurrency(state.valuation) + ' VAL';
+
+      // Server Load
+      document.getElementById('valLoad').textContent = Math.round(state.serverLoad) + '%';
+      document.getElementById('fillLoad').style.width = Math.min(100, Math.max(3, state.serverLoad)) + '%';
+      document.getElementById('valUsers').textContent = formatNumber(state.activeUsers);
+      
+      const loadFill = document.getElementById('fillLoad');
+      const loadPill = document.getElementById('loadStatusPill');
+      if (state.serverLoad > 85) {
+        loadFill.style.background = 'var(--red)';
+        loadPill.className = 'flow-neg';
+        loadPill.textContent = '🔥 OVERLOAD';
+      } else if (state.serverLoad > 65) {
+        loadFill.style.background = 'var(--amber)';
+        loadPill.className = 'flow-warn';
+        loadPill.textContent = 'STRESSED';
+      } else {
+        loadFill.style.background = 'var(--cyan)';
+        loadPill.className = 'flow-pos';
+        loadPill.textContent = 'NOMINAL';
+      }
+
+      // AI Quality
+      document.getElementById('valQuality').innerHTML = `${state.aiQuality.toFixed(1)} <span style="font-size: 0.8rem; color: var(--text-dark);">IQ</span>`;
+      document.getElementById('fillQuality').style.width = Math.min(100, state.aiQuality) + '%';
+      
+      let ver = 'SYNAPSE-v1';
+      if (state.aiQuality > 85) ver = 'SYNAPSE-AGI';
+      else if (state.aiQuality > 70) ver = 'SYNAPSE-MoE';
+      else if (state.aiQuality > 55) ver = 'SYNAPSE-v2';
+      document.getElementById('valModelVer').textContent = ver;
+
+      // Public Trust
+      document.getElementById('valTrust').textContent = Math.round(state.publicTrust) + '%';
+      document.getElementById('fillTrust').style.width = Math.min(100, state.publicTrust) + '%';
+      const trustPill = document.getElementById('trustStatusPill');
+      const riskEl = document.getElementById('valLegalRisk');
+      if (state.publicTrust < 30) {
+        trustPill.className = 'flow-neg';
+        trustPill.textContent = 'CRITICAL';
+        riskEl.textContent = 'SUBPOENA RISK';
+        riskEl.style.color = 'var(--red)';
+      } else if (state.publicTrust < 60) {
+        trustPill.className = 'flow-warn';
+        trustPill.textContent = 'MODERATE';
+        riskEl.textContent = 'MONITORED';
+        riskEl.style.color = 'var(--amber)';
+      } else {
+        trustPill.className = 'flow-pos';
+        trustPill.textContent = 'HIGH';
+        riskEl.textContent = state.trustShield ? 'SHIELDED ✓' : 'SECURE';
+        riskEl.style.color = 'var(--green)';
+      }
+
+      document.getElementById('datacenterMetrics').textContent = `CAPACITY: ${formatNumber(state.userCapacity)} CONCURRENT`;
+      document.getElementById('tapBonusText').textContent = `+$${250 * state.tapMultiplier} / +20 Tokens`;
+
+      // Sync player competitor row
+      const playerComp = state.competitors.find(c => c.id === 'player');
+      if (playerComp) {
+        playerComp.val = state.valuation;
+        playerComp.agi = state.aiQuality;
+      }
+
+      // Sort competitors by valuation
+      state.competitors.sort((a, b) => b.val - a.val);
+      state.competitors.forEach((c, idx) => c.rank = idx + 1);
+
+      const playerRank = state.competitors.find(c => c.id === 'player')?.rank || 3;
+      document.getElementById('qualityRankPill').textContent = `RANK #${playerRank}`;
+
+      renderCompetitors();
+      updateUpgradeButtons();
+      updateSpecialistButtons();
+      checkMilestones();
+      if (typeof updateWarRoomHUD === 'function') updateWarRoomHUD();
+    }
+
+    /* ==========================================================================
+       8. COMPETITORS & ESPIONAGE ACTIONS
+       ========================================================================== */
+    function renderCompetitors() {
+      // Mini Rows
+      const miniCont = document.getElementById('miniRaceRows');
+      miniCont.innerHTML = state.competitors.map(c => `
+        <div class="competitor-row ${c.id === 'player' ? 'is-player' : ''}">
+          <div class="competitor-info">
+            <span class="comp-name-badge">
+              <span class="comp-rank">#${c.rank}</span>
+              <span style="color: ${c.color}">${c.name}</span>
+              ${c.defeated ? '<span style="font-size: 0.65rem; color: var(--text-dark);">(ACQUIRED)</span>' : ''}
+            </span>
+            <div class="comp-stats-right">
+              <span>${formatCurrency(c.val)}</span>
+              <span style="color: ${c.color}">AGI: ${c.agi.toFixed(1)}%</span>
+            </div>
+          </div>
+          <div class="comp-progress-bar">
+            <div class="comp-progress-fill" style="width: ${Math.min(100, c.agi)}%; background: ${c.color};"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Full Rows with Espionage Actions
+      const fullCont = document.getElementById('fullRaceRows');
+      fullCont.innerHTML = state.competitors.map(c => `
+        <div class="competitor-row ${c.id === 'player' ? 'is-player' : ''}" style="padding: 0.9rem;">
+          <div class="competitor-info">
+            <div class="comp-name-badge">
+              <span class="comp-rank">#${c.rank}</span>
+              <span style="font-size: 0.95rem; font-weight: 800; color: ${c.color}">${c.name}</span>
+              ${c.id === 'player' ? '<span style="font-size: 0.65rem; background: var(--purple); padding: 1px 6px; border-radius: 4px;">YOUR FIRM</span>' : ''}
+              ${c.defeated ? '<span style="font-size: 0.65rem; background: rgba(0, 255, 136, 0.2); color: var(--green); padding: 1px 6px; border-radius: 4px;">ACQUIRED SUBSIDIARY ✓</span>' : ''}
+            </div>
+            <div class="comp-stats-right">
+              <span style="font-weight: 800; font-size: 0.85rem;">${formatCurrency(c.val)}</span>
+              <span style="color: ${c.color}; font-weight: 800;">${c.agi.toFixed(1)}% TO AGI</span>
+            </div>
+          </div>
+          <div class="comp-progress-bar" style="height: 10px; margin-top: 0.35rem;">
+            <div class="comp-progress-fill" style="width: ${Math.min(100, c.agi)}%; background: ${c.color};"></div>
+          </div>
+
+          ${c.id !== 'player' && !c.defeated ? `
+            <div class="rival-sabotage-bar">
+              <button class="btn-sabotage" onclick="sabotageRival('${c.id}', 'poach')" ${state.cash < 25000 ? 'disabled' : ''}>
+                🕵️ Poach Lead Researcher ($25k)
+              </button>
+              <button class="btn-sabotage" onclick="sabotageRival('${c.id}', 'leak')" ${state.cash < 15000 ? 'disabled' : ''}>
+                📰 Leak Benchmark Scandal ($15k)
+              </button>
+              <button class="btn-sabotage" onclick="sabotageRival('${c.id}', 'buyout')" ${state.valuation <= c.val || state.cash < (c.val * 0.05) ? 'disabled' : ''}>
+                🤝 Hostile Buyout (${formatCurrency(c.val * 0.05)})
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    window.sabotageRival = function(rivalId, action) {
+      const rival = state.competitors.find(c => c.id === rivalId);
+      if (!rival || rival.defeated) return;
+
+      if (action === 'poach') {
+        if (state.cash < 25000) return;
+        state.cash -= 25000;
+        rival.agi = Math.max(0, rival.agi - 5.0);
+        state.aiQuality = Math.min(100, state.aiQuality + 4.5);
+        playTone('upgrade');
+        addDecreeLog(`Espionage: Poached lead neural architect from ${rival.name}!`);
+        spawnFloatParticle(`-5% AGI on ${rival.name}`, null, null, true);
+      } else if (action === 'leak') {
+        if (state.cash < 15000) return;
+        state.cash -= 15000;
+        rival.val = Math.max(1000000, rival.val * 0.85);
+        state.publicTrust = Math.min(100, state.publicTrust + 8);
+        playTone('alert');
+        addDecreeLog(`PR Warfare: Exposed benchmark contamination scandal at ${rival.name}!`);
+        spawnFloatParticle(`Valuation hit on ${rival.name}`, null, null, true);
+      } else if (action === 'buyout') {
+        const cost = rival.val * 0.05;
+        if (state.cash < cost || state.valuation <= rival.val) return;
+        state.cash -= cost;
+        rival.defeated = true;
+        state.activeUsers += 400000;
+        playTone('hype');
+        triggerCelebrationModal(
+          "HOSTILE TAKEOVER COMPLETED",
+          `Synapse Dynamics has formally acquired ${rival.name} in an aggressive multi-billion dollar stock and cash absorption.`
+        );
+        addDecreeLog(`Acquisition: ${rival.name} absorbed into Synapse Dynamics!`);
+      }
+
+      updateHUD();
+    };
+
+    /* ==========================================================================
+       9. SPECIALISTS / TALENT SUITE
+       ========================================================================== */
+    function initSpecialists() {
+      const grid = document.getElementById('specialistsGrid');
+      grid.innerHTML = SPECIALISTS_DB.map(s => `
+        <div class="specialist-card" id="specCard-${s.id}">
+          <div class="specialist-avatar">${s.avatar}</div>
+          <div class="specialist-details">
+            <div class="specialist-name">
+              <span>${s.name}</span>
+              <span style="font-size: 0.7rem; color: var(--gold); font-family: var(--font-mono);">${formatCurrency(s.cost)}</span>
+            </div>
+            <span class="specialist-role">${s.role}</span>
+            <span class="specialist-perk">${s.perk}</span>
+            <button class="btn-hire" id="btnHire-${s.id}" onclick="hireSpecialist('${s.id}')">
+              HIRE TALENT
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateSpecialistButtons() {
+      let count = 0;
+      SPECIALISTS_DB.forEach(s => {
+        const btn = document.getElementById(`btnHire-${s.id}`);
+        const card = document.getElementById(`specCard-${s.id}`);
+        if (!btn || !card) return;
+
+        if (s.hired) {
+          count++;
+          btn.disabled = true;
+          btn.style.background = 'rgba(0, 255, 136, 0.2)';
+          btn.style.color = 'var(--green)';
+          btn.textContent = 'HIRED ✓';
+          card.classList.add('hired');
+        } else {
+          btn.disabled = state.cash < s.cost;
+        }
+      });
+      document.getElementById('talentCountText').textContent = `${count} / ${SPECIALISTS_DB.length} Specialists`;
+    }
+
+    window.hireSpecialist = function(id) {
+      const spec = SPECIALISTS_DB.find(s => s.id === id);
+      if (!spec || spec.hired || state.cash < spec.cost) return;
+
+      state.cash -= spec.cost;
+      spec.hired = true;
+      spec.apply(state);
+
+      playTone('upgrade');
+      addDecreeLog(`Executive Hired: ${spec.name} (${spec.role}) joined the team!`);
+      updateHUD();
+    };
+
+    /* ==========================================================================
+       10. UPGRADES
+       ========================================================================== */
+    function initUpgrades() {
+      const grid = document.getElementById('upgradeCardsGrid');
+      grid.innerHTML = UPGRADES_DB.map(upg => `
+        <div class="upgrade-card" id="card-${upg.id}">
+          <div class="upgrade-card-header">
+            <div class="upgrade-title-box">
+              <span class="upgrade-name">${upg.name}</span>
+              <span class="upgrade-tier">${upg.dept}</span>
+            </div>
+            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--gold); font-weight: 800;">
+              ${formatCurrency(upg.cost)}
+            </span>
+          </div>
+
+          <p class="upgrade-desc">${upg.desc}</p>
+
+          <div class="upgrade-benefits">
+            ${upg.benefits.map(b => `<span class="benefit-tag">${b}</span>`).join('')}
+          </div>
+
+          <button class="btn-buy-upgrade" id="btn-${upg.id}" onclick="buyUpgrade('${upg.id}')">
+            <span>UPGRADE</span>
+            <span>${formatCurrency(upg.cost)}</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function updateUpgradeButtons() {
+      let count = 0;
+      UPGRADES_DB.forEach(upg => {
+        const btn = document.getElementById(`btn-${upg.id}`);
+        const card = document.getElementById(`card-${upg.id}`);
+        if (!btn || !card) return;
+
+        if (upg.unlocked) {
+          count++;
+          btn.disabled = true;
+          btn.style.background = 'rgba(0, 255, 136, 0.2)';
+          btn.style.color = 'var(--green)';
+          btn.innerHTML = '<span>UNLOCKED ✓</span><span>ACTIVE</span>';
+          card.style.opacity = '0.7';
+        } else {
+          btn.disabled = state.cash < upg.cost;
+        }
+      });
+      document.getElementById('upgradesTotalPurchased').textContent = `${count} / ${UPGRADES_DB.length} UNLOCKED`;
+    }
+
+    window.buyUpgrade = function(id) {
+      const upg = UPGRADES_DB.find(u => u.id === id);
+      if (!upg || upg.unlocked || state.cash < upg.cost) return;
+
+      state.cash -= upg.cost;
+      upg.unlocked = true;
+      upg.apply(state);
+
+      playTone('upgrade');
+      addDecreeLog(`Tech Upgrade Enacted: ${upg.name} (${upg.dept})`);
+      updateHUD();
+    };
+
+    /* ==========================================================================
+       11. TINDER / REIGNS SWIPEABLE CRISIS DECREE SYSTEM
+       ========================================================================== */
+    let currentCrisis = null;
+    const swipeCard = document.getElementById('swipeCrisisCard');
+    const stampApprove = document.getElementById('stampApprove');
+    const stampVeto = document.getElementById('stampVeto');
+
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+
+    function initSwipeControls() {
+      // Touch events
+      swipeCard.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX - startX;
+        applyCardTransform(currentX);
+      }, { passive: true });
+
+      window.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        finishSwipe(currentX);
+      });
+
+      // Mouse events
+      swipeCard.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX - startX;
+        applyCardTransform(currentX);
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        finishSwipe(currentX);
+      });
+    }
+
+    function applyCardTransform(deltaX) {
+      const rotate = deltaX * 0.08;
+      swipeCard.style.transform = `translateX(${deltaX}px) rotate(${rotate}deg)`;
+
+      // Update stamp opacities
+      if (deltaX > 20) {
+        stampApprove.style.opacity = Math.min(1, deltaX / 90);
+        stampVeto.style.opacity = 0;
+      } else if (deltaX < -20) {
+        stampVeto.style.opacity = Math.min(1, Math.abs(deltaX) / 90);
+        stampApprove.style.opacity = 0;
+      } else {
+        stampApprove.style.opacity = 0;
+        stampVeto.style.opacity = 0;
+      }
+    }
+
+    function finishSwipe(deltaX) {
+      if (deltaX > 80) {
+        // Swiped Right -> Approve [A]
+        swipeCard.style.transform = 'translateX(400px) rotate(25deg)';
+        setTimeout(() => {
+          resolveCrisis('A');
+          resetSwipeCard();
+        }, 120);
+      } else if (deltaX < -80) {
+        // Swiped Left -> Veto [B]
+        swipeCard.style.transform = 'translateX(-400px) rotate(-25deg)';
+        setTimeout(() => {
+          resolveCrisis('B');
+          resetSwipeCard();
+        }, 120);
+      } else {
+        // Snap back
+        swipeCard.style.transform = 'translateX(0px) rotate(0deg)';
+        stampApprove.style.opacity = 0;
+        stampVeto.style.opacity = 0;
+      }
+    }
+
+    function resetSwipeCard() {
+      swipeCard.style.transform = 'translateX(0px) rotate(0deg)';
+      stampApprove.style.opacity = 0;
+      stampVeto.style.opacity = 0;
+    }
+
+    function triggerRandomCrisis() {
+      if (document.getElementById('crisisModal').classList.contains('open') || document.getElementById('celebrationModal').classList.contains('open')) return;
+
+      const randomEvent = CRISIS_EVENTS[Math.floor(Math.random() * CRISIS_EVENTS.length)];
+      currentCrisis = randomEvent;
+
+      document.getElementById('crisisDayTag').textContent = `DAY ${state.day}`;
+      document.getElementById('crisisHeadline').textContent = randomEvent.headline;
+      document.getElementById('crisisBody').textContent = randomEvent.body;
+
+      document.getElementById('crisisOptAText').textContent = randomEvent.optA_text;
+      document.getElementById('crisisOptBText').textContent = randomEvent.optB_text;
+
+      const effA = randomEvent.optA_effect;
+      document.getElementById('crisisOptAEff').innerHTML = `
+        <span class="eff-badge ${effA.cash >= 0 ? 'eff-pos' : 'eff-neg'}">${effA.cash >= 0 ? '+' : ''}${formatCurrency(effA.cash)}</span>
+        <span class="eff-badge ${effA.serverLoad <= 0 ? 'eff-pos' : 'eff-neg'}">⚡ ${effA.serverLoad > 0 ? '+' : ''}${effA.serverLoad}% Load</span>
+        <span class="eff-badge ${effA.aiQuality >= 0 ? 'eff-pos' : 'eff-neg'}">🧠 ${effA.aiQuality > 0 ? '+' : ''}${effA.aiQuality} IQ</span>
+        <span class="eff-badge ${effA.publicTrust >= 0 ? 'eff-pos' : 'eff-neg'}">🛡️ ${effA.publicTrust > 0 ? '+' : ''}${effA.publicTrust} Trust</span>
+      `;
+
+      const effB = randomEvent.optB_effect;
+      document.getElementById('crisisOptBEff').innerHTML = `
+        <span class="eff-badge ${effB.cash >= 0 ? 'eff-pos' : 'eff-neg'}">${effB.cash >= 0 ? '+' : ''}${formatCurrency(effB.cash)}</span>
+        <span class="eff-badge ${effB.serverLoad <= 0 ? 'eff-pos' : 'eff-neg'}">⚡ ${effB.serverLoad > 0 ? '+' : ''}${effB.serverLoad}% Load</span>
+        <span class="eff-badge ${effB.aiQuality >= 0 ? 'eff-pos' : 'eff-neg'}">🧠 ${effB.aiQuality > 0 ? '+' : ''}${effB.aiQuality} IQ</span>
+        <span class="eff-badge ${effB.publicTrust >= 0 ? 'eff-pos' : 'eff-neg'}">🛡️ ${effB.publicTrust > 0 ? '+' : ''}${effB.publicTrust} Trust</span>
+      `;
+
+      resetSwipeCard();
+      document.getElementById('crisisModal').classList.add('open');
+      document.getElementById('decreeAlertDot').style.display = 'block';
+      playTone('alert');
+    }
+
+    function resolveCrisis(choice) {
+      if (!currentCrisis) return;
+      const effect = choice === 'A' ? currentCrisis.optA_effect : currentCrisis.optB_effect;
+      const text = choice === 'A' ? currentCrisis.optA_text : currentCrisis.optB_text;
+
+      state.cash += effect.cash;
+      state.serverLoad = Math.max(5, Math.min(100, state.serverLoad + effect.serverLoad));
+      state.aiQuality = Math.max(5, Math.min(100, state.aiQuality + effect.aiQuality));
+
+      // Trust shield check
+      if (effect.publicTrust < 0 && state.trustShield) {
+        state.publicTrust = Math.max(0, state.publicTrust + Math.round(effect.publicTrust * 0.4));
+      } else {
+        state.publicTrust = Math.max(0, Math.min(100, state.publicTrust + effect.publicTrust));
+      }
+
+      addDecreeLog(`Decree Enacted (${choice === 'A' ? 'Approved' : 'Vetoed'}): ${currentCrisis.headline} → ${text}`);
+
+      document.getElementById('crisisModal').classList.remove('open');
+      document.getElementById('decreeAlertDot').style.display = 'none';
+      currentCrisis = null;
+
+      playTone('coin');
+      updateHUD();
+    }
+
+    function addDecreeLog(text) {
+      state.decreeHistory.unshift({ day: state.day, text });
+      const logCont = document.getElementById('decreeLogList');
+      logCont.innerHTML = state.decreeHistory.map(item => `
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-line); border-radius: 8px; padding: 0.6rem; font-size: 0.75rem; font-family: var(--font-mono); display: flex; gap: 0.5rem;">
+          <span style="color: var(--cyan); font-weight: 800;">DAY ${item.day}</span>
+          <span style="color: #cbd5e1;">${item.text}</span>
+        </div>
+      `).join('');
+      document.getElementById('decreeCount').textContent = `${state.decreeHistory.length} Decrees Enacted`;
+    }
+
+    /* ==========================================================================
+       12. CELEBRATION HYPE MODAL & CANVAS CONFETTI
+       ========================================================================== */
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const confettiCtx = confettiCanvas.getContext('2d');
+    let confettiParticles = [];
+
+    function resizeConfetti() {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeConfetti);
+    resizeConfetti();
+
+    function triggerCelebrationModal(headline, article) {
+      document.getElementById('newsDayStamp').textContent = `SPECIAL EDITION · DAY ${state.day}`;
+      document.getElementById('newsHeadline').textContent = headline;
+      document.getElementById('newsArticle').textContent = article;
+      document.getElementById('celebrationModal').classList.add('open');
+
+      playTone('hype');
+
+      // Launch confetti
+      confettiParticles = [];
+      const colors = ['#00f0ff', '#b800ff', '#00ff88', '#ffd700', '#ff2a55'];
+      for (let i = 0; i < 90; i++) {
+        confettiParticles.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * -confettiCanvas.height,
+          vx: (Math.random() - 0.5) * 5,
+          vy: Math.random() * 4 + 3,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 7 + 4,
+          tilt: Math.random() * 10
+        });
+      }
+      renderConfetti();
+    }
+
+    function renderConfetti() {
+      if (!document.getElementById('celebrationModal').classList.contains('open')) return;
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+      confettiParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.tilt += 0.1;
+
+        confettiCtx.fillStyle = p.color;
+        confettiCtx.fillRect(p.x, p.y, p.size, p.size);
+
+        if (p.y > confettiCanvas.height) {
+          p.y = -10;
+          p.x = Math.random() * confettiCanvas.width;
+        }
+      });
+
+      requestAnimationFrame(renderConfetti);
+    }
+
+    function checkMilestones() {
+      if (!state.milestones.seriesB && state.valuation >= 100000000) {
+        state.milestones.seriesB = true;
+        triggerCelebrationModal(
+          "SYNAPSE REACHES $100M SERIES B VALUATION",
+          "Wall Street syndicates and global sovereign funds validate Synapse Dynamics' exponential trajectory with a historic Series B financing round."
+        );
+      } else if (!state.milestones.unicorn && state.valuation >= 1000000000) {
+        state.milestones.unicorn = true;
+        triggerCelebrationModal(
+          "SYNAPSE DYNAMICS BREACHES $1 BILLION UNICORN STATUS",
+          "The tech industry bows to its newest titan. Synapse has officially joined the prestigious global Unicorn club as frontier compute capacity rivals tech conglomerates."
+        );
+      } else if (!state.milestones.decacorn && state.valuation >= 10000000000) {
+        state.milestones.decacorn = true;
+        triggerCelebrationModal(
+          "SYNAPSE BECOMES A $10 BILLION DECACORN",
+          "Global cloud providers now route mission-critical global inference through Synapse servers. A monopolistic economic moat has formed."
+        );
+      } else if (!state.milestones.agi && state.aiQuality >= 98.0) {
+        state.milestones.agi = true;
+        triggerCelebrationModal(
+          "ARTIFICIAL GENERAL INTELLIGENCE ACHIEVED",
+          "History pivots. Synapse Dynamics has developed the world's first proven autonomous superintelligent system, winning the global technological horizon."
+        );
+      }
+    }
+
+    /* ==========================================================================
+       13. REAL-TIME TICK LOOP (SLOWER PACING: ~2.2 SECONDS PER DAY)
+       ========================================================================== */
+    const BASE_TICK_INTERVAL_MS = 2200; // 2.2 seconds per day at 1X
+
+    const NEWS_HEADLINES = [
+      "Apex AI secures $10B venture tranche from sovereign wealth fund.",
+      "NeuroCore open-source weights downloaded 40 million times.",
+      "Silicon Valley VC summit forecasts 2027 AGI arrival.",
+      "Global GPU memory prices fluctuate amid Taiwan Strait shipping delays.",
+      "US Senate Subcommittee requests voluntary safety commitments from frontier labs.",
+      "European Union AI Act compliance audits begin worldwide.",
+      "Breakthrough synthetic reasoning paper published on arXiv."
+    ];
+
+    function runSimulationTick() {
+      if (state.simSpeed > 0) {
+        state.day += 1;
+
+        // Calendar display
+        const year = Math.floor((state.day - 1) / 365) + 1;
+        const quarter = Math.floor(((state.day - 1) % 365) / 90) + 1;
+        document.getElementById('liveDayNum').textContent = state.day;
+        document.getElementById('liveCalendarText').textContent = `YEAR ${year} · Q${quarter}`;
+
+        // User growth
+        state.activeUsers += Math.round(state.dailyUserGrowth * (1 + (state.publicTrust / 100) * 0.4));
+
+        // Real Server Load calculation
+        const rawLoad = (state.activeUsers / state.userCapacity) * 100;
+        state.serverLoad = Math.max(8, Math.min(100, Math.round(rawLoad)));
+
+        // Daily cash flow
+        const dailyRevenue = (state.activeUsers * state.baseRevenuePerUser);
+        const dailyComputeCost = (state.userCapacity * 0.04);
+        const netCash = dailyRevenue - dailyComputeCost;
+        state.cash += netCash;
+
+        // Daily War Room Tribute from Conquered Sectors
+        if (state.warRoom && state.warRoom.dailyTribute > 0) {
+          state.cash += state.warRoom.dailyTribute;
+          state.warRoom.totalTributeCollected += state.warRoom.dailyTribute;
+        }
+
+        // Organic AI IQ training trickle
+        state.aiQuality = Math.min(100, state.aiQuality + (0.05 * state.agiSpeedMultiplier));
+
+        // Competitor organic progress
+        state.competitors.forEach(c => {
+          if (c.id !== 'player' && !c.defeated) {
+            c.val += (Math.random() * 50000000) - 15000000;
+            c.agi = Math.min(100, c.agi + (Math.random() * 0.08));
+          }
+        });
+
+        // News headlines
+        if (state.day % 7 === 0) {
+          const headline = NEWS_HEADLINES[Math.floor(Math.random() * NEWS_HEADLINES.length)];
+          document.getElementById('tickerText').textContent = headline;
+        }
+
+        // Trigger crisis events every ~16 days
+        if (state.day % 16 === 0) {
+          triggerRandomCrisis();
+        }
+
+        // Overload penalty
+        if (state.serverLoad >= 100) {
+          state.consecutiveOverloadDays += 1;
+          state.publicTrust = Math.max(0, state.publicTrust - 3);
+          if (state.consecutiveOverloadDays >= 4) {
+            state.publicTrust = Math.max(0, state.publicTrust - 15);
+            addDecreeLog("CRITICAL CLUSTER FAILURE: 100% Load sustained, active users fleeing!");
+          }
+        } else {
+          state.consecutiveOverloadDays = 0;
+        }
+
+        updateHUD();
+      }
+
+      // Schedule next tick
+      const delay = state.simSpeed === 0 ? 1000 : (BASE_TICK_INTERVAL_MS / state.simSpeed);
+      setTimeout(runSimulationTick, delay);
+    }
+
+    /* ==========================================================================
+       13.5 GLOBAL CONQUEST WAR ROOM & DEFCON ENGINE
+       ========================================================================== */
+    const warCanvas = document.getElementById('warMapCanvas');
+    const warCtx = warCanvas.getContext('2d');
+    let radarSweepAngle = 0;
+    let combatMissiles = []; // { sx, sy, tx, ty, t, color }
+    let combatExplosions = []; // { x, y, radius, maxRadius, alpha, color }
+    let battleInterval = null;
+
+    function resizeWarCanvas() {
+      if (!warCanvas) return;
+      const rect = warCanvas.getBoundingClientRect();
+      if (rect.width === 0) return;
+      warCanvas.width = rect.width * (window.devicePixelRatio || 1);
+      warCanvas.height = rect.height * (window.devicePixelRatio || 1);
+      warCtx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    }
+    window.addEventListener('resize', resizeWarCanvas);
+    setTimeout(resizeWarCanvas, 50);
+
+    // Simplified vector paths for continent outlines (normalized 0..1)
+    const CONTINENT_PATHS = [
+      // North America
+      [[0.10, 0.18], [0.18, 0.16], [0.28, 0.22], [0.32, 0.35], [0.24, 0.44], [0.16, 0.42], [0.12, 0.30]],
+      // South America
+      [[0.26, 0.52], [0.35, 0.54], [0.38, 0.68], [0.32, 0.85], [0.28, 0.72]],
+      // Eurasia / Europe
+      [[0.44, 0.25], [0.52, 0.18], [0.65, 0.16], [0.82, 0.20], [0.88, 0.32], [0.78, 0.40], [0.65, 0.36], [0.55, 0.34], [0.46, 0.35]],
+      // Africa
+      [[0.46, 0.42], [0.58, 0.44], [0.56, 0.62], [0.50, 0.76], [0.44, 0.58]],
+      // Australia
+      [[0.78, 0.68], [0.88, 0.66], [0.90, 0.78], [0.80, 0.82]]
+    ];
+
+    function renderWarMapCanvas() {
+      if (!warCanvas) return;
+      const rect = warCanvas.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      if (w === 0 || h === 0) {
+        requestAnimationFrame(renderWarMapCanvas);
+        return;
+      }
+
+      warCtx.clearRect(0, 0, w, h);
+
+      // 1. Draw Defcon Radar Circles & Grid
+      warCtx.strokeStyle = 'rgba(0, 240, 255, 0.07)';
+      warCtx.lineWidth = 1;
+
+      // Lat/Long lines
+      for (let x = 0; x <= w; x += w / 8) {
+        warCtx.beginPath();
+        warCtx.moveTo(x, 0);
+        warCtx.lineTo(x, h);
+        warCtx.stroke();
+      }
+      for (let y = 0; y <= h; y += h / 6) {
+        warCtx.beginPath();
+        warCtx.moveTo(0, y);
+        warCtx.lineTo(w, y);
+        warCtx.stroke();
+      }
+
+      // Radar rings
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+      for (let r = 40; r < Math.max(w, h); r += 60) {
+        warCtx.beginPath();
+        warCtx.arc(cx, cy, r, 0, Math.PI * 2);
+        warCtx.stroke();
+      }
+
+      // 2. Draw Vector Continent Outlines
+      warCtx.strokeStyle = 'rgba(0, 240, 255, 0.18)';
+      warCtx.fillStyle = 'rgba(0, 240, 255, 0.025)';
+      warCtx.lineWidth = 1.5;
+
+      CONTINENT_PATHS.forEach(pts => {
+        warCtx.beginPath();
+        pts.forEach((pt, i) => {
+          const px = pt[0] * w;
+          const py = pt[1] * h;
+          if (i === 0) warCtx.moveTo(px, py);
+          else warCtx.lineTo(px, py);
+        });
+        warCtx.closePath();
+        warCtx.fill();
+        warCtx.stroke();
+      });
+
+      // 3. Draw Strategic Conduit Lines between sectors
+      warCtx.setLineDash([4, 4]);
+      warCtx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+      warCtx.lineWidth = 1;
+
+      for (let i = 0; i < SECTORS.length - 1; i++) {
+        const s1 = SECTORS[i];
+        const s2 = SECTORS[i + 1];
+        warCtx.beginPath();
+        warCtx.moveTo(s1.x * w, s1.y * h);
+        warCtx.lineTo(s2.x * w, s2.y * h);
+        warCtx.stroke();
+      }
+      warCtx.setLineDash([]);
+
+      // 4. Draw Rotating Radar Sweep
+      radarSweepAngle += 0.015;
+      warCtx.save();
+      warCtx.translate(cx, cy);
+      warCtx.rotate(radarSweepAngle);
+      const sweepGrad = warCtx.createRadialGradient(0, 0, 10, 0, 0, Math.max(w, h));
+      sweepGrad.addColorStop(0, 'rgba(0, 240, 255, 0.22)');
+      sweepGrad.addColorStop(0.3, 'rgba(0, 240, 255, 0.06)');
+      sweepGrad.addColorStop(1, 'transparent');
+      warCtx.fillStyle = sweepGrad;
+      warCtx.beginPath();
+      warCtx.moveTo(0, 0);
+      warCtx.arc(0, 0, Math.max(w, h), 0, Math.PI / 4);
+      warCtx.closePath();
+      warCtx.fill();
+      warCtx.restore();
+
+      // 5. Draw Missile Trajectories & Explosions
+      for (let i = combatMissiles.length - 1; i >= 0; i--) {
+        const m = combatMissiles[i];
+        m.t += 0.04;
+        const curX = m.sx + (m.tx - m.sx) * m.t;
+        const curY = m.sy + (m.ty - m.sy) * m.t - Math.sin(Math.max(0, m.t) * Math.PI) * 35; // parabolic arc
+
+        warCtx.strokeStyle = m.color || '#ff2a55';
+        warCtx.lineWidth = 2;
+        warCtx.beginPath();
+        warCtx.moveTo(m.sx, m.sy);
+        warCtx.lineTo(curX, curY);
+        warCtx.stroke();
+
+        // Missile head
+        warCtx.fillStyle = '#fff';
+        warCtx.beginPath();
+        warCtx.arc(curX, curY, 3, 0, Math.PI * 2);
+        warCtx.fill();
+
+        if (m.t >= 1) {
+          combatExplosions.push({ x: m.tx, y: m.ty, radius: 4, maxRadius: 28, alpha: 1, color: m.color });
+          combatMissiles.splice(i, 1);
+        }
+      }
+
+      for (let i = combatExplosions.length - 1; i >= 0; i--) {
+        const exp = combatExplosions[i];
+        exp.radius += 1.2;
+        exp.alpha -= 0.04;
+        if (exp.alpha <= 0) {
+          combatExplosions.splice(i, 1);
+          continue;
+        }
+        warCtx.strokeStyle = exp.color || '#ff2a55';
+        warCtx.lineWidth = 2;
+        warCtx.beginPath();
+        warCtx.arc(exp.x, exp.y, exp.radius, 0, Math.PI * 2);
+        warCtx.stroke();
+      }
+
+      // 6. Draw Sector Nodes
+      const now = Date.now();
+      SECTORS.forEach(sec => {
+        const sx = sec.x * w;
+        const sy = sec.y * h;
+        const isSelected = sec.id === state.warRoom.selectedSectorId;
+        const isBattleTarget = state.warRoom.activeBattle && state.warRoom.activeBattle.sectorId === sec.id;
+
+        // Base node circle
+        const nodeColor = sec.conquered ? '#00ff88' : (isBattleTarget ? '#ff2a55' : '#ffaa00');
+
+        // Outer pulsing ring
+        const pulse = (Math.sin(now / 300 + (sec.baseDefense % 10)) + 1) * 3;
+        warCtx.strokeStyle = sec.conquered ? 'rgba(0, 255, 136, 0.4)' : 'rgba(255, 42, 85, 0.4)';
+        warCtx.lineWidth = 1;
+        warCtx.beginPath();
+        warCtx.arc(sx, sy, 8 + pulse, 0, Math.PI * 2);
+        warCtx.stroke();
+
+        // Node center
+        warCtx.fillStyle = nodeColor;
+        warCtx.beginPath();
+        warCtx.arc(sx, sy, 5, 0, Math.PI * 2);
+        warCtx.fill();
+
+        // Node label
+        warCtx.fillStyle = '#fff';
+        warCtx.font = 'bold 8px monospace';
+        warCtx.fillText(sec.name.split(' ')[0], sx + 10, sy + 3);
+
+        // Status indicator
+        warCtx.fillStyle = sec.conquered ? '#00ff88' : '#94a3b8';
+        warCtx.font = '7px monospace';
+        warCtx.fillText(sec.conquered ? 'SECURED' : `${formatNumber(sec.currentDefense)} DEF`, sx + 10, sy + 11);
+
+        // Target Reticle if selected
+        if (isSelected) {
+          warCtx.strokeStyle = '#00f0ff';
+          warCtx.lineWidth = 2;
+          const retSize = 13;
+          // Top left
+          warCtx.beginPath();
+          warCtx.moveTo(sx - retSize, sy - retSize + 4);
+          warCtx.lineTo(sx - retSize, sy - retSize);
+          warCtx.lineTo(sx - retSize + 4, sy - retSize);
+          // Top right
+          warCtx.moveTo(sx + retSize - 4, sy - retSize);
+          warCtx.lineTo(sx + retSize, sy - retSize);
+          warCtx.lineTo(sx + retSize, sy - retSize + 4);
+          // Bottom left
+          warCtx.moveTo(sx - retSize, sy + retSize - 4);
+          warCtx.lineTo(sx - retSize, sy + retSize);
+          warCtx.lineTo(sx - retSize + 4, sy + retSize);
+          // Bottom right
+          warCtx.moveTo(sx + retSize - 4, sy + retSize);
+          warCtx.lineTo(sx + retSize, sy + retSize);
+          warCtx.lineTo(sx + retSize, sy + retSize - 4);
+          warCtx.stroke();
+        }
+      });
+
+      requestAnimationFrame(renderWarMapCanvas);
+    }
+
+    function initWarRoom() {
+      renderSectorChips();
+      renderFoundryUnits();
+      updateSelectedSectorDossier();
+      updateWarRoomHUD();
+
+      // Canvas click hit-testing
+      warCanvas.addEventListener('click', (e) => {
+        const rect = warCanvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        const w = rect.width;
+        const h = rect.height;
+
+        let closestSector = null;
+        let minDist = 32; // 32px touch radius
+
+        SECTORS.forEach(sec => {
+          const sx = sec.x * w;
+          const sy = sec.y * h;
+          const dist = Math.hypot(clickX - sx, clickY - sy);
+          if (dist < minDist) {
+            minDist = dist;
+            closestSector = sec;
+          }
+        });
+
+        if (closestSector) {
+          selectSector(closestSector.id);
+        }
+      });
+
+      // Invasion button
+      const invadeBtn = document.getElementById('btnLaunchInvasion');
+      if (invadeBtn) invadeBtn.addEventListener('click', startInvasion);
+
+      // Tactical buttons
+      document.getElementById('btnTacEmp').addEventListener('click', () => useTacticalStrike('emp'));
+      document.getElementById('btnTacDive').addEventListener('click', () => useTacticalStrike('dive'));
+      document.getElementById('btnTacNuke').addEventListener('click', () => useTacticalStrike('nuke'));
+      document.getElementById('btnRetreatBattle').addEventListener('click', retreatBattle);
+
+      // Ascension button
+      document.getElementById('btnAscendPlanet').addEventListener('click', ascendPlanet);
+
+      // Kick off render loop
+      requestAnimationFrame(renderWarMapCanvas);
+    }
+
+    function renderSectorChips() {
+      const cont = document.getElementById('sectorChipsList');
+      if (!cont) return;
+      cont.innerHTML = SECTORS.map(sec => `
+        <div class="sector-chip ${sec.id === state.warRoom.selectedSectorId ? 'active' : ''} ${sec.conquered ? 'conquered' : ''}" onclick="selectSector('${sec.id}')">
+          <span>${sec.conquered ? '✓' : '⚠'}</span>
+          <span>${sec.name}</span>
+        </div>
+      `).join('');
+    }
+
+    window.selectSector = function(sectorId) {
+      state.warRoom.selectedSectorId = sectorId;
+      playTone('click');
+      renderSectorChips();
+      updateSelectedSectorDossier();
+    };
+
+    function updateSelectedSectorDossier() {
+      const sec = SECTORS.find(s => s.id === state.warRoom.selectedSectorId) || SECTORS[0];
+      const nameEl = document.getElementById('dossierSectorName');
+      if (!nameEl) return;
+      nameEl.textContent = sec.name;
+      document.getElementById('dossierRegion').textContent = sec.region;
+      document.getElementById('dossierController').textContent = sec.controller;
+      document.getElementById('dossierDefensePower').textContent = `${formatNumber(sec.currentDefense)} POWER`;
+      document.getElementById('dossierTributeReward').textContent = `+${formatCurrency(sec.tribute)} / day`;
+      document.getElementById('dossierPerkName').textContent = sec.perkName;
+
+      const badge = document.getElementById('dossierStatusBadge');
+      const actionCont = document.getElementById('dossierActionContainer');
+
+      if (sec.conquered) {
+        badge.style.background = 'rgba(0, 255, 136, 0.15)';
+        badge.style.color = 'var(--green)';
+        badge.style.borderColor = 'var(--green)';
+        badge.textContent = 'SECURED & PACIFIED ✓';
+        actionCont.innerHTML = `
+          <div style="background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 8px; padding: 0.75rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--green); text-align: center;">
+            ✓ SECTOR UNDER AUTONOMOUS SYNAPSE COMMAND · GENERATING +${formatCurrency(sec.tribute)} / DAY TRIBUTE
+          </div>
+        `;
+      } else {
+        badge.style.background = 'rgba(255, 42, 85, 0.2)';
+        badge.style.color = 'var(--red)';
+        badge.style.borderColor = 'var(--red)';
+        badge.textContent = 'HOSTILE FORTRESS ⚠';
+        actionCont.innerHTML = `
+          <button class="btn-invade-primary" id="btnLaunchInvasion" onclick="startInvasion()">
+            <span>⚔️ COMMENCE MILITARY INVASION</span>
+          </button>
+        `;
+      }
+    }
+
+    function renderFoundryUnits() {
+      const cont = document.getElementById('unitsMarketGrid');
+      if (!cont) return;
+      cont.innerHTML = MILITARY_UNITS.map(unit => {
+        const owned = state.warRoom[unit.id] || 0;
+        return `
+          <div class="unit-procure-card">
+            <div class="unit-card-top">
+              <div class="unit-title-group">
+                <span>${unit.icon}</span>
+                <span>${unit.name}</span>
+              </div>
+              <span class="unit-owned-badge">${owned} BATTALIONS</span>
+            </div>
+            <div class="unit-desc">${unit.desc}</div>
+            <div class="unit-power-row">
+              <span>+${formatNumber(unit.powerPerPack)} Army Power</span>
+              <span>${formatCurrency(unit.cost)}</span>
+            </div>
+            <button class="btn-procure-unit" onclick="buyMilitaryUnit('${unit.id}')" ${state.cash < unit.cost ? 'disabled' : ''}>
+              <span>PROCURE BATTALION</span>
+              <span>-${formatCurrency(unit.cost)}</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.buyMilitaryUnit = function(unitId) {
+      const unit = MILITARY_UNITS.find(u => u.id === unitId);
+      if (!unit || state.cash < unit.cost) return;
+
+      state.cash -= unit.cost;
+      state.warRoom[unitId] = (state.warRoom[unitId] || 0) + 1;
+
+      playTone('upgrade');
+      spawnFloatParticle(`+${formatNumber(unit.powerPerPack)} Army Power`, null, null, true);
+      updateWarRoomHUD();
+      renderFoundryUnits();
+      updateHUD();
+    };
+
+    function updateWarRoomHUD() {
+      const standing = (state.warRoom.drones * 250) +
+                       (state.warRoom.mechs * 1500) +
+                       (state.warRoom.cruisers * 7000) +
+                       (state.warRoom.orbitalLasers * 40000);
+      state.warRoom.standingPower = standing;
+
+      const conqueredCount = SECTORS.filter(s => s.conquered).length;
+      state.warRoom.conqueredCount = conqueredCount;
+
+      let dailyTribute = 0;
+      SECTORS.filter(s => s.conquered).forEach(s => dailyTribute += s.tribute);
+      state.warRoom.dailyTribute = dailyTribute;
+
+      const pwrEl = document.getElementById('warTotalPower');
+      if (pwrEl) {
+        pwrEl.textContent = `${formatNumber(standing)} POWER`;
+        document.getElementById('warDailyTribute').textContent = `+${formatCurrency(dailyTribute)} / DAY`;
+        document.getElementById('warTotalLoot').textContent = formatCurrency(state.warRoom.totalTributeCollected);
+        document.getElementById('warConquestRatio').textContent = `${conqueredCount} / 12 SECTORS CONQUERED (${Math.round((conqueredCount / 12) * 100)}%)`;
+        document.getElementById('warAscensionBadge').textContent = `TIER ${state.warRoom.ascensionTier} PLANETARY CAMPAIGN`;
+
+        // Check Ascension unlock
+        const ascBox = document.getElementById('planetaryAscensionBox');
+        if (ascBox) {
+          if (conqueredCount === 12) {
+            ascBox.style.display = 'flex';
+          } else {
+            ascBox.style.display = 'none';
+          }
+        }
+      }
+
+      // Re-evaluate unit buttons
+      renderFoundryUnits();
+    }
+
+    /* ==========================================================================
+       BATTLE INVASION SIMULATOR ENGINE
+       ========================================================================== */
+    window.startInvasion = function() {
+      const sec = SECTORS.find(s => s.id === state.warRoom.selectedSectorId);
+      if (!sec || sec.conquered) return;
+
+      if (state.warRoom.standingPower <= 0) {
+        playTone('alert');
+        alert("Your military army has 0 combat power! Procure Drone Swarms or Combat Mechs from the Foundry below using company runway cash.");
+        return;
+      }
+
+      playTone('siren');
+
+      // Initialize combat state
+      const playerMaxHp = state.warRoom.standingPower * 10;
+      const enemyMaxHp = sec.currentDefense * 10;
+
+      state.warRoom.activeBattle = {
+        sectorId: sec.id,
+        playerHp: playerMaxHp,
+        maxPlayerHp: playerMaxHp,
+        enemyHp: enemyMaxHp,
+        maxEnemyHp: enemyMaxHp
+      };
+
+      document.getElementById('combatSimulatorPanel').style.display = 'flex';
+      document.getElementById('combatSectorTitle').textContent = sec.name.toUpperCase();
+      document.getElementById('sectorDossierCard').style.display = 'none';
+
+      // Launch visual missiles on canvas
+      const w = warCanvas.width / (window.devicePixelRatio || 1);
+      const h = warCanvas.height / (window.devicePixelRatio || 1);
+      for (let i = 0; i < 4; i++) {
+        combatMissiles.push({
+          sx: w * 0.18,
+          sy: h * 0.38,
+          tx: sec.x * w,
+          ty: sec.y * h,
+          t: -0.2 * i,
+          color: '#00f0ff'
+        });
+      }
+
+      const log = document.getElementById('battleLogStream');
+      log.innerHTML = `<div>[DEFCON 1] Cyber-army deployed. Engaging ${sec.controller} defense shields!</div>`;
+
+      if (battleInterval) clearInterval(battleInterval);
+      battleInterval = setInterval(runBattleTick, 750);
+    };
+
+    function runBattleTick() {
+      const b = state.warRoom.activeBattle;
+      if (!b) {
+        clearInterval(battleInterval);
+        return;
+      }
+
+      const sec = SECTORS.find(s => s.id === b.sectorId);
+      if (!sec) return;
+
+      // Player attacks enemy
+      const playerDmg = Math.round((state.warRoom.standingPower * 0.45) + (state.aiQuality * 12) + (Math.random() * 80));
+      b.enemyHp = Math.max(0, b.enemyHp - playerDmg);
+
+      // Enemy counter-attacks
+      const enemyDmg = Math.round((sec.currentDefense * 0.32) + (Math.random() * 60));
+      b.playerHp = Math.max(0, b.playerHp - enemyDmg);
+
+      playTone('boom');
+
+      // Update UI
+      const playerPerc = Math.round((b.playerHp / b.maxPlayerHp) * 100);
+      const enemyPerc = Math.round((b.enemyHp / b.maxEnemyHp) * 100);
+
+      document.getElementById('playerHpBar').style.width = playerPerc + '%';
+      document.getElementById('playerHpText').textContent = `${playerPerc}% (${formatNumber(b.playerHp)} HP)`;
+      document.getElementById('enemyHpBar').style.width = enemyPerc + '%';
+      document.getElementById('enemyHpText').textContent = `${enemyPerc}% (${formatNumber(b.enemyHp)} HP)`;
+
+      const log = document.getElementById('battleLogStream');
+      const logEntry = document.createElement('div');
+      logEntry.innerHTML = `<span style="color: var(--cyan);">${formatNumber(playerDmg)} DMG</span> to Fortress · Received <span style="color: var(--red);">${formatNumber(enemyDmg)} DMG</span>`;
+      log.prepend(logEntry);
+
+      // Add visual tracer
+      const w = warCanvas.width / (window.devicePixelRatio || 1);
+      const h = warCanvas.height / (window.devicePixelRatio || 1);
+      combatMissiles.push({
+        sx: w * 0.2,
+        sy: h * 0.35,
+        tx: sec.x * w,
+        ty: sec.y * h,
+        t: 0,
+        color: '#ff2a55'
+      });
+
+      // Victory Condition
+      if (b.enemyHp <= 0) {
+        clearInterval(battleInterval);
+        sec.conquered = true;
+        state.cash += sec.lootReward;
+        state.warRoom.totalTributeCollected += sec.lootReward;
+
+        playTone('hype');
+        triggerCelebrationModal(
+          `${sec.name.toUpperCase()} LIBERATED & PACIFIED`,
+          `Synapse Autonomous Divisions crushed the ${sec.controller} garrison. Secured +${formatCurrency(sec.lootReward)} in seized sovereign vaults and unlocked permanent +${formatCurrency(sec.tribute)}/day tribute.`
+        );
+
+        endBattle();
+        updateWarRoomHUD();
+        renderSectorChips();
+        updateSelectedSectorDossier();
+        updateHUD();
+        return;
+      }
+
+      // Defeat Condition
+      if (b.playerHp <= 0) {
+        clearInterval(battleInterval);
+        playTone('alert');
+        alert(`Invasion of ${sec.name} failed! Your attacking forces were repelled. Rebuild your army in the Foundry and strike again.`);
+        endBattle();
+        updateWarRoomHUD();
+        return;
+      }
+    }
+
+    window.useTacticalStrike = function(type) {
+      const b = state.warRoom.activeBattle;
+      if (!b) return;
+
+      if (type === 'emp') {
+        if (state.cash < 50000) return;
+        state.cash -= 50000;
+        const dmg = Math.round(b.maxEnemyHp * 0.25);
+        b.enemyHp = Math.max(0, b.enemyHp - dmg);
+        playTone('laser');
+        spawnFloatParticle(`-25% EMP STRIKE!`, null, null, true);
+      } else if (type === 'dive') {
+        if (state.cash < 100000) return;
+        state.cash -= 100000;
+        const dmg = Math.round(b.maxEnemyHp * 0.40);
+        b.enemyHp = Math.max(0, b.enemyHp - dmg);
+        playTone('boom');
+        spawnFloatParticle(`CRIT DIVE -40%!`, null, null, true);
+      } else if (type === 'nuke') {
+        if (state.cash < 500000) return;
+        state.cash -= 500000;
+        const dmg = Math.round(b.maxEnemyHp * 0.55);
+        b.enemyHp = Math.max(0, b.enemyHp - dmg);
+        playTone('nuke');
+        spawnFloatParticle(`KINETIC NUKE -55%!`, null, null, true);
+      }
+
+      updateHUD();
+      const log = document.getElementById('battleLogStream');
+      const logEntry = document.createElement('div');
+      logEntry.style.color = 'var(--gold)';
+      logEntry.textContent = `[TACTICAL CALL-IN] Direct Runway Air-Strike deployed (${type.toUpperCase()})!`;
+      log.prepend(logEntry);
+    };
+
+    function retreatBattle() {
+      if (battleInterval) clearInterval(battleInterval);
+      endBattle();
+      playTone('alert');
+    }
+
+    function endBattle() {
+      state.warRoom.activeBattle = null;
+      document.getElementById('combatSimulatorPanel').style.display = 'none';
+      document.getElementById('sectorDossierCard').style.display = 'flex';
+    }
+
+    window.ascendPlanet = function() {
+      if (state.warRoom.conqueredCount < 12) return;
+
+      state.warRoom.ascensionTier += 1;
+      SECTORS.forEach(sec => {
+        sec.conquered = false;
+        sec.currentDefense = Math.round(sec.baseDefense * Math.pow(2.2, state.warRoom.ascensionTier - 1));
+        sec.tribute = Math.round(sec.tribute * 1.8);
+        sec.lootReward = Math.round(sec.lootReward * 1.8);
+      });
+
+      playTone('hype');
+      triggerCelebrationModal(
+        `PLANETARY ASCENSION TIER ${state.warRoom.ascensionTier}`,
+        `Earth has entered an elevated state of cybernetic conflict. Advanced rogue machine intelligences have fortified the 12 sectors with 2.2x defense power. War tribute rewards are substantially increased!`
+      );
+
+      updateWarRoomHUD();
+      renderSectorChips();
+      updateSelectedSectorDossier();
+    };
+
+    /* ==========================================================================
+       14. EVENT HANDLERS & INITIALIZATION
+       ========================================================================== */
+    function initEvents() {
+      // Tab navigation
+      document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          playTone('click');
+          document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+          btn.classList.add('active');
+          const target = btn.getAttribute('data-tab');
+          document.getElementById(target).classList.add('active');
+          if (target === 'paneConquest') {
+            setTimeout(resizeWarCanvas, 20);
+          }
+        });
+      });
+
+      document.getElementById('btnViewFullRace').addEventListener('click', () => {
+        document.querySelector('.nav-tab-btn[data-tab="paneRace"]').click();
+      });
+
+      // Simulation speed controls
+      const speedBtns = [
+        { el: document.getElementById('btnSpeedPause'), speed: 0 },
+        { el: document.getElementById('btnSpeed1x'), speed: 1 },
+        { el: document.getElementById('btnSpeed2x'), speed: 2 },
+        { el: document.getElementById('btnSpeed4x'), speed: 4 }
+      ];
+
+      speedBtns.forEach(item => {
+        item.el.addEventListener('click', () => {
+          playTone('click');
+          speedBtns.forEach(b => b.el.classList.remove('active'));
+          item.el.classList.add('active');
+          state.simSpeed = item.speed;
+        });
+      });
+
+      // Audio toggle
+      document.getElementById('btnAudioToggle').addEventListener('click', () => {
+        state.audioEnabled = !state.audioEnabled;
+        document.getElementById('btnAudioToggle').textContent = state.audioEnabled ? '🔊' : '🔇';
+        if (state.audioEnabled) playTone('click');
+      });
+
+      // Tap to Compute Action
+      document.getElementById('serverCanvasWrapper').addEventListener('click', (e) => {
+        handleTapCompute(e.clientX, e.clientY);
+      });
+
+      document.getElementById('btnBigTapCompute').addEventListener('click', (e) => {
+        handleTapCompute(e.clientX, e.clientY);
+      });
+
+      // Quick Ops in Datacenter
+      document.getElementById('btnFlushCache').addEventListener('click', (e) => {
+        state.serverLoad = Math.max(5, state.serverLoad - 15);
+        playTone('click');
+        spawnFloatParticle("-15% LOAD", e.clientX, e.clientY, true);
+        updateHUD();
+      });
+
+      document.getElementById('btnTurboOverclock').addEventListener('click', (e) => {
+        state.cash += 8000;
+        state.serverLoad = Math.min(100, state.serverLoad + 12);
+        playTone('coin');
+        spawnFloatParticle("+$8,000", e.clientX, e.clientY, true);
+        updateHUD();
+      });
+
+      document.getElementById('btnEmergencyCredits').addEventListener('click', (e) => {
+        if (state.cash < 15000) return;
+        state.cash -= 15000;
+        state.serverLoad = Math.max(5, state.serverLoad - 30);
+        playTone('click');
+        spawnFloatParticle("-30% LOAD", e.clientX, e.clientY, true);
+        updateHUD();
+      });
+
+      // Crisis buttons
+      document.getElementById('btnCrisisA').addEventListener('click', () => resolveCrisis('A'));
+      document.getElementById('btnCrisisB').addEventListener('click', () => resolveCrisis('B'));
+
+      // Celebration modal close
+      document.getElementById('btnClaimCelebration').addEventListener('click', () => {
+        document.getElementById('celebrationModal').classList.remove('open');
+        playTone('click');
+      });
+    }
+
+    // Launch Game Engine
+    initUpgrades();
+    initSpecialists();
+    initSwipeControls();
+    initWarRoom();
+    initEvents();
+    updateHUD();
+    setTimeout(runSimulationTick, 1000);
+
+  </script>
+</body>
+</html>
